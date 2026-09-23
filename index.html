@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>CONCH MTB-22-00 Monitor</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            color: #e5e7eb;
+            background: #0f172a;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .description {
+            margin-top: 0;
+            color: #94a3b8;
+        }
+
+        .toolbar,
+        .card,
+        .chart-card,
+        .log-card {
+            margin-bottom: 18px;
+            padding: 18px;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            background: #1e293b;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            gap: 12px;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        button {
+            min-height: 42px;
+            padding: 9px 12px;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #f8fafc;
+            background: #0f172a;
+        }
+
+        button {
+            cursor: pointer;
+            border: 0;
+            font-weight: bold;
+            background: #0284c7;
+        }
+
+        button:hover {
+            background: #0369a1;
+        }
+
+        button.disconnect {
+            background: #b91c1c;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .status {
+            padding: 10px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            background: #475569;
+        }
+
+        .status.online {
+            background: #166534;
+        }
+
+        .status.error {
+            background: #991b1b;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .temperature {
+            margin: 12px 0 20px;
+            font-size: 46px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .open-value {
+            color: #f87171;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        .row:last-child {
+            border-bottom: 0;
+        }
+
+        .normal {
+            color: #4ade80;
+        }
+
+        .fault {
+            color: #f87171;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            background: #0b1220;
+        }
+
+        #log {
+            height: 180px;
+            margin: 0;
+            padding: 12px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            color: #a7f3d0;
+            background: #020617;
+            border-radius: 8px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+
+        .note {
+            color: #fbbf24;
+        }
+
+        @media (max-width: 700px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>CONCH MTB-22-00</h1>
+
+    <p class="description">
+        Đọc Modbus RTU trực tiếp bằng Web Serial
+    </p>
+
+    <div class="toolbar">
+        <label>
+            Slave ID
+            <input id="slaveId"
+                   type="number"
+                   min="1"
+                   max="247"
+                   value="1">
+        </label>
+
+        <label>
+            Baud rate
+            <select id="baudRate">
+                <option value="2400">2400</option>
+                <option value="4800">4800</option>
+                <option value="9600" selected>9600</option>
+                <option value="19200">19200</option>
+                <option value="38400">38400</option>
+            </select>
+        </label>
+
+        <label>
+            Định dạng nhiệt độ
+            <select id="temperatureScale">
+                <option value="10" selected>
+                    1 số lẻ — K1/K2
+                </option>
+
+                <option value="1">
+                    Số nguyên — K3/K4/K5/K6
+                </option>
+            </select>
+        </label>
+
+        <label>
+            Chu kỳ đọc
+            <select id="pollInterval">
+                <option value="500">0,5 giây</option>
+                <option value="1000" selected>1 giây</option>
+                <option value="2000">2 giây</option>
+                <option value="5000">5 giây</option>
+            </select>
+        </label>
+
+        <button id="connectButton">
+            Kết nối USB–RS485
+        </button>
+
+        <span id="status" class="status">
+            Chưa kết nối
+        </span>
+    </div>
+
+    <p class="note">
+        Với InTy = K1, hãy chọn “1 số lẻ — K1/K2”.
+    </p>
+
+    <div class="grid">
+        <section class="card">
+            <h2>CH1</h2>
+
+            <div id="ch1Pv" class="temperature">
+                -- °C
+            </div>
+
+            <div class="row">
+                <span>SV</span>
+                <strong id="ch1Sv">-- °C</strong>
+            </div>
+
+            <div class="row">
+                <span>Công suất OUT</span>
+                <strong id="ch1Out">-- %</strong>
+            </div>
+
+            <div class="row">
+                <span>Mã lỗi</span>
+                <strong id="ch1Error">--</strong>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>CH2</h2>
+
+            <div id="ch2Pv" class="temperature">
+                -- °C
+            </div>
+
+            <div class="row">
+                <span>SV</span>
+                <strong id="ch2Sv">-- °C</strong>
+            </div>
+
+            <div class="row">
+                <span>Công suất OUT</span>
+                <strong id="ch2Out">-- %</strong>
+            </div>
+
+            <div class="row">
+                <span>Mã lỗi</span>
+                <strong id="ch2Error">--</strong>
+            </div>
+        </section>
+    </div>
+
+    <section class="chart-card">
+        <h2>Biểu đồ thời gian thực</h2>
+        <canvas id="chart"
+                width="1000"
+                height="300">
+        </canvas>
+    </section>
+
+    <section class="log-card">
+        <h2>Nhật ký giao tiếp</h2>
+        <pre id="log"></pre>
+    </section>
+</div>
+
+<script>
+"use strict";
+
+/*
+ * Địa chỉ thanh ghi của MTB-22-00
+ * Đây là offset 0-based, không phải dạng 4xxxx.
+ */
+const REGISTERS = {
+    SV: 0,
+    OUTPUT: 518,
+    PV: 588,
+    ERROR: 596
+};
+
+let port = null;
+let reader = null;
+let connected = false;
+let pendingRequest = null;
+let receiveBuffer = [];
+
+const historyLimit = 120;
+const historyCh1 = [];
+const historyCh2 = [];
+
+const connectButton =
+    document.getElementById("connectButton");
+
+const statusElement =
+    document.getElementById("status");
+
+const logElement =
+    document.getElementById("log");
+
+
+function addLog(message) {
+    const time = new Date().toLocaleTimeString("vi-VN");
+
+    logElement.textContent +=
+        `[${time}] ${message}\n`;
+
+    logElement.scrollTop =
+        logElement.scrollHeight;
+}
+
+
+function setStatus(text, type = "") {
+    statusElement.textContent = text;
+    statusElement.className =
+        `status ${type}`.trim();
+}
+
+
+function sleep(milliseconds) {
+    return new Promise(resolve =>
+        setTimeout(resolve, milliseconds)
+    );
+}
+
+
+/*
+ * CRC-16 Modbus.
+ */
+function calculateCrc(bytes) {
+    let crc = 0xFFFF;
+
+    for (const byte of bytes) {
+        crc ^= byte;
+
+        for (let bit = 0; bit < 8; bit++) {
+            if ((crc & 1) !== 0) {
+                crc = (crc >> 1) ^ 0xA001;
+            } else {
+                crc >>= 1;
+            }
+        }
+    }
+
+    return crc & 0xFFFF;
+}
+
+
+function addCrc(bytes) {
+    const frame = [...bytes];
+    const crc = calculateCrc(frame);
+
+    // Modbus RTU gửi CRC byte thấp trước.
+    frame.push(crc & 0xFF);
+    frame.push((crc >> 8) & 0xFF);
+
+    return new Uint8Array(frame);
+}
+
+
+function checkCrc(frame) {
+    if (frame.length < 4) {
+        return false;
+    }
+
+    const body = frame.slice(0, -2);
+    const expectedCrc = calculateCrc(body);
+
+    const receivedCrc =
+        frame[frame.length - 2] |
+        (frame[frame.length - 1] << 8);
+
+    return expectedCrc === receivedCrc;
+}
+
+
+function toSigned16(value) {
+    return value >= 0x8000
+        ? value - 0x10000
+        : value;
+}
+
+
+function bytesToHex(bytes) {
+    return Array.from(bytes)
+        .map(value =>
+            value.toString(16)
+                .padStart(2, "0")
+                .toUpperCase()
+        )
+        .join(" ");
+}
+
+
+/*
+ * Nhận dữ liệu từ cổng serial.
+ */
+function handleIncomingBytes(chunk) {
+    receiveBuffer.push(...chunk);
+
+    if (!pendingRequest) {
+        return;
+    }
+
+    const slaveId =
+        Number(document.getElementById("slaveId").value);
+
+    /*
+     * Bỏ các byte rác trước địa chỉ Slave ID.
+     */
+    while (
+        receiveBuffer.length > 0 &&
+        receiveBuffer[0] !== slaveId
+    ) {
+        receiveBuffer.shift();
+    }
+
+    if (receiveBuffer.length < 5) {
+        return;
+    }
+
+    const functionCode = receiveBuffer[1];
+    let expectedLength;
+
+    if (functionCode === 0x03) {
+        const byteCount = receiveBuffer[2];
+        expectedLength = 5 + byteCount;
+
+    } else if ((functionCode & 0x80) !== 0) {
+        expectedLength = 5;
+
+    } else {
+        pendingRequest.reject(
+            new Error(
+                `Function code không hỗ trợ: ${functionCode}`
+            )
+        );
+
+        clearTimeout(pendingRequest.timer);
+        pendingRequest = null;
+        receiveBuffer = [];
+        return;
+    }
+
+    if (receiveBuffer.length < expectedLength) {
+        return;
+    }
+
+    const frame =
+        receiveBuffer.splice(0, expectedLength);
+
+    addLog(`RX: ${bytesToHex(frame)}`);
+
+    if (!checkCrc(frame)) {
+        pendingRequest.reject(
+            new Error("CRC phản hồi không đúng")
+        );
+
+    } else if ((functionCode & 0x80) !== 0) {
+        pendingRequest.reject(
+            new Error(
+                `Modbus exception code ${frame[2]}`
+            )
+        );
+
+    } else {
+        pendingRequest.resolve(frame);
+    }
+
+    clearTimeout(pendingRequest.timer);
+    pendingRequest = null;
+}
+
+
+async function serialReadLoop() {
+    reader = port.readable.getReader();
+
+    try {
+        while (connected) {
+            const result = await reader.read();
+
+            if (result.done) {
+                break;
+            }
+
+            if (result.value) {
+                handleIncomingBytes(result.value);
+            }
+        }
+
+    } catch (error) {
+        if (connected) {
+            addLog(`Lỗi đọc serial: ${error.message}`);
+            setStatus("Lỗi serial", "error");
+        }
+
+    } finally {
+        reader.releaseLock();
+        reader = null;
+    }
+}
+
+
+/*
+ * Gửi một khung Modbus và chờ phản hồi.
+ */
+async function sendRequest(frame) {
+    if (!connected || !port) {
+        throw new Error("Chưa kết nối cổng serial");
+    }
+
+    if (pendingRequest) {
+        throw new Error("Đang chờ phản hồi trước đó");
+    }
+
+    receiveBuffer = [];
+
+    let resolveRequest;
+    let rejectRequest;
+
+    const responsePromise = new Promise(
+        (resolve, reject) => {
+            resolveRequest = resolve;
+            rejectRequest = reject;
+        }
+    );
+
+    const timer = setTimeout(() => {
+        if (pendingRequest) {
+            pendingRequest.reject(
+                new Error("Timeout: MTB không phản hồi")
+            );
+
+            pendingRequest = null;
+            receiveBuffer = [];
+        }
+    }, 1200);
+
+    pendingRequest = {
+        resolve: resolveRequest,
+        reject: rejectRequest,
+        timer: timer
+    };
+
+    const writer = port.writable.getWriter();
+
+    try {
+        addLog(`TX: ${bytesToHex(frame)}`);
+        await writer.write(frame);
+
+    } catch (error) {
+        clearTimeout(timer);
+        pendingRequest = null;
+        throw error;
+
+    } finally {
+        writer.releaseLock();
+    }
+
+    return responsePromise;
+}
+
+
+/*
+ * Đọc Holding Registers — Function 03.
+ */
+async function readHoldingRegisters(address, count) {
+    const slaveId =
+        Number(document.getElementById("slaveId").value);
+
+    const request = addCrc([
+        slaveId,
+        0x03,
+        (address >> 8) & 0xFF,
+        address & 0xFF,
+        (count >> 8) & 0xFF,
+        count & 0xFF
+    ]);
+
+    const response = await sendRequest(request);
+
+    const byteCount = response[2];
+
+    if (byteCount !== count * 2) {
+        throw new Error(
+            `Số byte trả về không đúng: ${byteCount}`
+        );
+    }
+
+    const registers = [];
+
+    for (let index = 0; index < count; index++) {
+        const highByte = response[3 + index * 2];
+        const lowByte = response[4 + index * 2];
+
+        registers.push(
+            (highByte << 8) | lowByte
+        );
+    }
+
+    return registers;
+}
+
+
+function decodeError(code) {
+    if (code === 0) {
+        return "Bình thường";
+    }
+
+    const messages = [];
+
+    if ((code & 4) !== 0) {
+        messages.push("Open");
+    }
+
+    return messages.length > 0
+        ? `${messages.join(", ")} (${code})`
+        : `Mã ${code}`;
+}
+
+
+function updateErrorElement(elementId, code) {
+    const element =
+        document.getElementById(elementId);
+
+    element.textContent = decodeError(code);
+
+    element.className =
+        code === 0 ? "normal" : "fault";
+}
+
+
+function displayTemperature(
+    elementId,
+    rawValue,
+    errorCode
+) {
+    const element =
+        document.getElementById(elementId);
+
+    if ((errorCode & 4) !== 0) {
+        element.textContent = "OPEN";
+        element.className =
+            "temperature open-value";
+
+        return null;
+    }
+
+    const divisor =
+        Number(
+            document.getElementById(
+                "temperatureScale"
+            ).value
+        );
+
+    const value =
+        toSigned16(rawValue) / divisor;
+
+    element.textContent =
+        `${value.toFixed(divisor === 10 ? 1 : 0)} °C`;
+
+    element.className = "temperature";
+
+    return value;
+}
+
+
+async function readAllData() {
+    /*
+     * Đọc SV CH1 và CH2.
+     */
+    const sv = await readHoldingRegisters(
+        REGISTERS.SV,
+        2
+    );
+
+    /*
+     * Đọc công suất OUT CH1 và CH2.
+     */
+    const output = await readHoldingRegisters(
+        REGISTERS.OUTPUT,
+        2
+    );
+
+    /*
+     * Đọc PV CH1 và CH2.
+     */
+    const pv = await readHoldingRegisters(
+        REGISTERS.PV,
+        2
+    );
+
+    /*
+     * Đọc ErrCode CH1 và CH2.
+     */
+    const error = await readHoldingRegisters(
+        REGISTERS.ERROR,
+        2
+    );
+
+    const divisor =
+        Number(
+            document.getElementById(
+                "temperatureScale"
+            ).value
+        );
+
+    document.getElementById("ch1Sv").textContent =
+        `${(
+            toSigned16(sv[0]) / divisor
+        ).toFixed(divisor === 10 ? 1 : 0)} °C`;
+
+    document.getElementById("ch2Sv").textContent =
+        `${(
+            toSigned16(sv[1]) / divisor
+        ).toFixed(divisor === 10 ? 1 : 0)} °C`;
+
+    document.getElementById("ch1Out").textContent =
+        `${(toSigned16(output[0]) / 10).toFixed(1)} %`;
+
+    document.getElementById("ch2Out").textContent =
+        `${(toSigned16(output[1]) / 10).toFixed(1)} %`;
+
+    updateErrorElement("ch1Error", error[0]);
+    updateErrorElement("ch2Error", error[1]);
+
+    const ch1Temperature =
+        displayTemperature(
+            "ch1Pv",
+            pv[0],
+            error[0]
+        );
+
+    const ch2Temperature =
+        displayTemperature(
+            "ch2Pv",
+            pv[1],
+            error[1]
+        );
+
+    historyCh1.push(ch1Temperature);
+    historyCh2.push(ch2Temperature);
+
+    if (historyCh1.length > historyLimit) {
+        historyCh1.shift();
+        historyCh2.shift();
+    }
+
+    drawChart();
+
+    setStatus(
+        `Đang đọc — ${new Date().toLocaleTimeString("vi-VN")}`,
+        "online"
+    );
+}
+
+
+async function pollingLoop() {
+    while (connected) {
+        const startedAt = Date.now();
+
+        try {
+            await readAllData();
+
+        } catch (error) {
+            addLog(`LỖI: ${error.message}`);
+            setStatus(error.message, "error");
+        }
+
+        const interval =
+            Number(
+                document.getElementById(
+                    "pollInterval"
+                ).value
+            );
+
+        const elapsed = Date.now() - startedAt;
+
+        await sleep(
+            Math.max(100, interval - elapsed)
+        );
+    }
+}
+
+
+function drawChart() {
+    const canvas =
+        document.getElementById("chart");
+
+    const context =
+        canvas.getContext("2d");
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    context.clearRect(0, 0, width, height);
+
+    context.fillStyle = "#0b1220";
+    context.fillRect(0, 0, width, height);
+
+    const allValues = [
+        ...historyCh1,
+        ...historyCh2
+    ].filter(value => value !== null);
+
+    if (allValues.length < 2) {
+        context.fillStyle = "#94a3b8";
+        context.font = "18px Arial";
+        context.fillText(
+            "Chưa có dữ liệu nhiệt độ hợp lệ",
+            30,
+            50
+        );
+        return;
+    }
+
+    let minimum = Math.min(...allValues);
+    let maximum = Math.max(...allValues);
+
+    if (maximum === minimum) {
+        maximum += 1;
+        minimum -= 1;
+    }
+
+    const padding = 40;
+
+    function drawLine(values, color) {
+        context.beginPath();
+        context.strokeStyle = color;
+        context.lineWidth = 3;
+
+        let started = false;
+
+        values.forEach((value, index) => {
+            if (value === null) {
+                started = false;
+                return;
+            }
+
+            const x =
+                padding +
+                index /
+                Math.max(1, historyLimit - 1) *
+                (width - padding * 2);
+
+            const y =
+                height - padding -
+                (value - minimum) /
+                (maximum - minimum) *
+                (height - padding * 2);
+
+            if (!started) {
+                context.moveTo(x, y);
+                started = true;
+            } else {
+                context.lineTo(x, y);
+            }
+        });
+
+        context.stroke();
+    }
+
+    drawLine(historyCh1, "#38bdf8");
+    drawLine(historyCh2, "#f59e0b");
+
+    context.fillStyle = "#38bdf8";
+    context.font = "16px Arial";
+    context.fillText("CH1", 45, 25);
+
+    context.fillStyle = "#f59e0b";
+    context.fillText("CH2", 105, 25);
+
+    context.fillStyle = "#94a3b8";
+    context.fillText(
+        `${maximum.toFixed(1)} °C`,
+        5,
+        50
+    );
+
+    context.fillText(
+        `${minimum.toFixed(1)} °C`,
+        5,
+        height - 15
+    );
+}
+
+
+async function connectSerial() {
+    if (!("serial" in navigator)) {
+        throw new Error(
+            "Trình duyệt hoặc chính sách IT không cho phép Web Serial"
+        );
+    }
+
+    const baudRate =
+        Number(
+            document.getElementById(
+                "baudRate"
+            ).value
+        );
+
+    /*
+     * Edge sẽ mở hộp thoại để người dùng
+     * chọn USB–RS485.
+     */
+    port = await navigator.serial.requestPort();
+
+    await port.open({
+        baudRate: baudRate,
+        dataBits: 8,
+        stopBits: 1,
+        parity: "none",
+        bufferSize: 255,
+        flowControl: "none"
+    });
+
+    connected = true;
+
+    connectButton.textContent = "Ngắt kết nối";
+    connectButton.className = "disconnect";
+
+    setStatus("Đã kết nối", "online");
+    addLog(`Đã mở cổng với baud ${baudRate}`);
+
+    serialReadLoop();
+    pollingLoop();
+}
+
+
+async function disconnectSerial() {
+    connected = false;
+
+    if (pendingRequest) {
+        clearTimeout(pendingRequest.timer);
+
+        pendingRequest.reject(
+            new Error("Đã ngắt kết nối")
+        );
+
+        pendingRequest = null;
+    }
+
+    if (reader) {
+        try {
+            await reader.cancel();
+        } catch (_) {
+        }
+
+        while (reader) {
+            await sleep(20);
+        }
+    }
+
+    if (port) {
+        try {
+            await port.close();
+        } catch (_) {
+        }
+    }
+
+    port = null;
+    receiveBuffer = [];
+
+    connectButton.textContent =
+        "Kết nối USB–RS485";
+
+    connectButton.className = "";
+
+    setStatus("Đã ngắt kết nối");
+    addLog("Đã đóng cổng serial");
+}
+
+
+connectButton.addEventListener(
+    "click",
+    async () => {
+        connectButton.disabled = true;
+
+        try {
+            if (connected) {
+                await disconnectSerial();
+            } else {
+                await connectSerial();
+            }
+
+        } catch (error) {
+            addLog(`LỖI KẾT NỐI: ${error.message}`);
+            setStatus(error.message, "error");
+
+            connected = false;
+            port = null;
+
+        } finally {
+            connectButton.disabled = false;
+        }
+    }
+);
+</script>
+</body>
+</html>
