@@ -19,11 +19,34 @@
         background: #0f172a;
     }
 
-    .container { max-width: 1400px; margin: auto; }
-    h1 { margin-bottom: 4px; }
+    .container { max-width: 1450px; margin: auto; }
+    h1 { margin: 0 0 4px; }
     h2 { margin-top: 0; }
     h3 { color: #7dd3fc; }
     .muted { color: #94a3b8; }
+
+    /* ===== THANH TIÊU ĐỀ + ĐỒNG HỒ ===== */
+    .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 14px;
+    }
+
+    .clock {
+        min-width: 230px;
+        padding: 10px 18px;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        text-align: center;
+        background: #020617;
+        font-family: Consolas, monospace;
+    }
+
+    #clockTime { font-size: 32px; font-weight: bold; color: #7dd3fc; }
+    #clockDate { font-size: 14px; color: #94a3b8; }
 
     .warning {
         margin-bottom: 18px;
@@ -32,6 +55,34 @@
         border-radius: 10px;
         color: #fde68a;
         background: rgba(245, 158, 11, 0.12);
+    }
+
+    /* ===== THANH BÁO ĐỘNG ===== */
+    .alarm-banner {
+        margin-bottom: 18px;
+        padding: 14px 18px;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .alarm-banner.ok {
+        border: 1px solid #166534;
+        color: #86efac;
+        background: rgba(22, 101, 52, 0.25);
+    }
+
+    .alarm-banner.active {
+        border: 1px solid #f87171;
+        color: #fff;
+        background: #991b1b;
+    }
+
+    .alarm-banner.blink { animation: bannerBlink 1s infinite; }
+
+    @keyframes bannerBlink {
+        0%, 100% { background: #b91c1c; }
+        50% { background: #450a0a; }
     }
 
     .section, .card, .toolbar {
@@ -79,13 +130,14 @@
         font-weight: bold;
         background: #0284c7;
     }
-    button:hover { background: #0369a1; }
+    button:hover { filter: brightness(0.9); }
     button.read-button { background: #7c3aed; }
     button.write-button { background: #b45309; }
     button.export-button { background: #15803d; }
-    button.export-button:hover { background: #166534; }
     button.clear-button { background: #475569; }
+    button.ack-button { background: #b91c1c; }
     button.disconnect { background: #b91c1c; }
+    button.small { min-height: 30px; padding: 4px 12px; font-size: 13px; }
     button:disabled { cursor: not-allowed; opacity: 0.45; }
 
     .button-row {
@@ -123,9 +175,9 @@
     .data-row:last-child { border-bottom: 0; }
 
     .normal { color: #4ade80; }
-    .fault { color: #f87171; }
+    .fault { color: #f87171; font-weight: bold; }
 
-    /* ===== BIỂU ĐỒ THỜI GIAN THỰC ===== */
+    /* ===== BIỂU ĐỒ ===== */
     .chart-controls {
         display: flex;
         flex-wrap: wrap;
@@ -134,11 +186,7 @@
         margin-bottom: 12px;
     }
 
-    .legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px; }
 
     .legend-item {
         display: flex;
@@ -152,11 +200,7 @@
         user-select: none;
     }
 
-    .legend-item input {
-        width: 16px;
-        min-height: 16px;
-        margin: 0;
-    }
+    .legend-item input { width: 16px; min-height: 16px; margin: 0; }
 
     .swatch {
         display: inline-block;
@@ -164,23 +208,19 @@
         height: 10px;
         border-radius: 3px;
     }
-
     .swatch.line { height: 4px; }
-    .swatch.dash {
-        height: 0;
-        border-top: 3px dashed;
-        background: none !important;
-    }
+    .swatch.dash { height: 0; border-top: 3px dashed; background: none !important; }
 
     #chart {
         display: block;
         width: 100%;
-        height: 400px;
+        height: 440px;
         border-radius: 8px;
         background: #0b1220;
         cursor: crosshair;
     }
 
+    /* ===== BẢNG ===== */
     .table-wrapper { overflow-x: auto; }
 
     table {
@@ -205,44 +245,46 @@
 
     th.ch1-head { background: #14532d; }
     th.ch2-head { background: #78350f; }
+    th.time-head { background: #1e3a8a; }
 
     /* Riêng cột mô tả chữ dài căn trái cho dễ đọc */
     td.description { text-align: left; }
 
-    tbody tr:nth-child(even) {
-        background: rgba(51, 65, 85, 0.35);
-    }
+    tbody tr:nth-child(even) { background: rgba(51, 65, 85, 0.35); }
 
-    .parameter-code {
+    .parameter-code { font-weight: bold; color: #7dd3fc; white-space: nowrap; }
+    .current-value { color: #86efac; font-family: Consolas, monospace; white-space: nowrap; }
+    .default-value { color: #fcd34d; font-family: Consolas, monospace; white-space: nowrap; }
+    .address { color: #c4b5fd; font-family: Consolas, monospace; }
+    .mono { font-family: Consolas, monospace; white-space: nowrap; }
+    .time-cell { color: #93c5fd; font-family: Consolas, monospace; white-space: nowrap; }
+
+    .realtime-table tbody tr:first-child { background: rgba(34, 197, 94, 0.15); }
+
+    /* ===== BẢNG CẢNH BÁO ===== */
+    .alarm-summary { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+
+    .pill {
+        padding: 7px 14px;
+        border-radius: 16px;
         font-weight: bold;
-        color: #7dd3fc;
-        white-space: nowrap;
+        background: #334155;
     }
+    .pill.red { background: #991b1b; }
+    .pill.yellow { background: #854d0e; }
 
-    .current-value {
-        color: #86efac;
-        font-family: Consolas, monospace;
-        white-space: nowrap;
-    }
+    .sev-error { color: #f87171; font-weight: bold; }
+    .sev-warn { color: #fbbf24; font-weight: bold; }
 
-    .default-value {
-        color: #fcd34d;
-        font-family: Consolas, monospace;
-        white-space: nowrap;
-    }
+    tr.alarm-active-unack { animation: rowBlink 1s infinite; }
+    tr.alarm-active-unack td { color: #fecaca; }
+    tr.alarm-active td { color: #fca5a5; }
+    tr.alarm-cleared-unack td { color: #fde68a; }
+    tr.alarm-cleared td { color: #94a3b8; }
 
-    .address {
-        color: #c4b5fd;
-        font-family: Consolas, monospace;
-    }
-
-    .mono {
-        font-family: Consolas, monospace;
-        white-space: nowrap;
-    }
-
-    .realtime-table tbody tr:first-child {
-        background: rgba(34, 197, 94, 0.15);
+    @keyframes rowBlink {
+        0%, 100% { background: rgba(239, 68, 68, 0.38); }
+        50% { background: rgba(239, 68, 68, 0.08); }
     }
 
     .write-table input {
@@ -257,29 +299,18 @@
         flex-direction: row;
         align-items: center;
         gap: 10px;
-        padding: 12px;
+        padding: 10px 12px;
         border-radius: 8px;
     }
 
-    .safety-check {
-        border: 1px solid #b45309;
-        background: rgba(180, 83, 9, 0.12);
-    }
+    .safety-check { border: 1px solid #b45309; background: rgba(180, 83, 9, 0.12); }
+    .option-check { border: 1px solid #15803d; background: rgba(21, 128, 61, 0.12); }
 
-    .option-check {
-        border: 1px solid #15803d;
-        background: rgba(21, 128, 61, 0.12);
-    }
+    .safety-check input, .option-check input { width: 20px; min-height: 20px; }
 
-    .safety-check input, .option-check input {
-        width: 20px;
-        min-height: 20px;
-    }
+    .option-list { display: flex; flex-wrap: wrap; gap: 10px; }
 
-    .export-info {
-        margin-top: 12px;
-        font-size: 14px;
-    }
+    .export-info { margin: 12px 0; font-size: 14px; }
 
     #log {
         height: 220px;
@@ -298,7 +329,7 @@
         .grid { grid-template-columns: 1fr; }
         body { padding: 9px; }
         .temperature { font-size: 40px; }
-        #chart { height: 320px; }
+        #chart { height: 340px; }
     }
 </style>
 </head>
@@ -306,13 +337,27 @@
 <body>
 <div class="container">
 
-<h1>CONCH MTB-22-00</h1>
-<p class="muted">Đọc và ghi Modbus RTU trực tiếp bằng Microsoft Edge</p>
+<!-- TIÊU ĐỀ + ĐỒNG HỒ -->
+<header class="topbar">
+    <div>
+        <h1>CONCH MTB-22-00</h1>
+        <p class="muted">Giám sát – đọc/ghi Modbus RTU trực tiếp bằng Microsoft Edge</p>
+    </div>
+    <div class="clock">
+        <div id="clockTime">--:--:--</div>
+        <div id="clockDate">--/--/----</div>
+    </div>
+</header>
 
 <div class="warning">
     <strong>Cảnh báo:</strong>
     Hãy ngắt tải gia nhiệt hoặc tín hiệu SSR trước khi thử ghi.
     Không Auto-Tuning hoặc thay đổi PID khi cảm biến đang báo Open.
+</div>
+
+<!-- THANH BÁO ĐỘNG -->
+<div id="alarmBanner" class="alarm-banner ok">
+    Hệ thống bình thường – không có cảnh báo
 </div>
 
 <!-- KẾT NỐI -->
@@ -392,9 +437,9 @@
     </section>
 </div>
 
-<!-- BIỂU ĐỒ THỜI GIAN THỰC -->
+<!-- BIỂU ĐỒ NHIỆT ĐỘ -->
 <section class="section">
-    <h2>Biểu đồ thời gian thực – PV / SV / OUT</h2>
+    <h2>Biểu đồ nhiệt độ thời gian thực – PV / SV / OUT</h2>
 
     <div class="chart-controls">
         <label>
@@ -402,23 +447,91 @@
             <select id="timeWindow">
                 <option value="60000">1 phút</option>
                 <option value="300000" selected>5 phút</option>
+                <option value="600000">10 phút</option>
                 <option value="900000">15 phút</option>
                 <option value="1800000">30 phút</option>
                 <option value="3600000">60 phút</option>
+                <option value="7200000">120 phút</option>
                 <option value="0">Toàn bộ</option>
             </select>
         </label>
 
         <div class="legend" id="chartLegend"></div>
+
+        <label class="legend-item">
+            <input id="showAlarmZones" type="checkbox" checked>
+            <span class="swatch" style="background:rgba(239,68,68,0.5)"></span>
+            <span>Vùng lỗi</span>
+        </label>
     </div>
 
     <canvas id="chart"></canvas>
 
     <p class="muted">
-        Đường liền: PV thực tế – Đường nét đứt: SV cài đặt (trục trái, nhiệt độ).
-        Cột: công suất OUT (trục phải, %). Trục ngang: giờ:phút:giây và ngày/tháng/năm.
-        Rê chuột lên biểu đồ để xem giá trị tại từng thời điểm.
+        Trục ngang: giờ:phút:giây (dòng trên) – ngày/tháng/năm (dòng dưới).
+        Đường liền: PV – Nét đứt: SV (trục trái, nhiệt độ). Cột: OUT (trục phải, %).
+        Nền đỏ/cam: khoảng thời gian cảm biến báo lỗi. Rê chuột để xem giá trị từng thời điểm.
     </p>
+</section>
+
+<!-- CẢNH BÁO & LỖI -->
+<section class="section" id="alarmSection">
+    <h2>Cảnh báo &amp; lỗi</h2>
+
+    <div class="chart-controls">
+        <label>
+            Lọc
+            <select id="alarmFilter">
+                <option value="all" selected>Tất cả</option>
+                <option value="active">Đang hoạt động</option>
+                <option value="unack">Chưa xác nhận</option>
+                <option value="cleared">Đã kết thúc</option>
+            </select>
+        </label>
+
+        <label class="option-check">
+            <input id="soundEnable" type="checkbox" checked>
+            <span>Âm báo khi có lỗi mới</span>
+        </label>
+
+        <button id="ackAllButton" class="ack-button">Xác nhận (ACK) tất cả</button>
+        <button id="clearAlarmButton" class="clear-button">Xóa cảnh báo đã kết thúc</button>
+    </div>
+
+    <div class="alarm-summary">
+        <span class="pill red">Đang hoạt động: <span id="alarmActiveCount">0</span></span>
+        <span class="pill yellow">Chưa xác nhận: <span id="alarmUnackCount">0</span></span>
+        <span class="pill">Tổng số: <span id="alarmTotalCount">0</span></span>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th rowspan="2">STT</th>
+                <th colspan="2" class="time-head">Xuất hiện</th>
+                <th colspan="2" class="time-head">Kết thúc</th>
+                <th rowspan="2">Thời lượng</th>
+                <th rowspan="2">Kênh</th>
+                <th rowspan="2">Mã lỗi</th>
+                <th rowspan="2">Mô tả</th>
+                <th rowspan="2">Mức độ</th>
+                <th rowspan="2">Trạng thái</th>
+                <th colspan="2" class="time-head">Xác nhận</th>
+                <th rowspan="2">Thao tác</th>
+            </tr>
+            <tr>
+                <th class="time-head">Ngày</th>
+                <th class="time-head">Giờ</th>
+                <th class="time-head">Ngày</th>
+                <th class="time-head">Giờ</th>
+                <th class="time-head">Ngày</th>
+                <th class="time-head">Giờ</th>
+            </tr>
+            </thead>
+            <tbody id="alarmTableBody"></tbody>
+        </table>
+    </div>
 </section>
 
 <!-- BẢNG DỮ LIỆU THỜI GIAN THỰC -->
@@ -442,8 +555,8 @@
             <thead>
             <tr>
                 <th rowspan="2">STT</th>
-                <th rowspan="2">Ngày</th>
-                <th rowspan="2">Giờ</th>
+                <th rowspan="2" class="time-head">Ngày</th>
+                <th rowspan="2" class="time-head">Giờ</th>
                 <th colspan="4" class="ch1-head">CH1</th>
                 <th colspan="4" class="ch2-head">CH2</th>
             </tr>
@@ -480,38 +593,63 @@
 
 <!-- XUẤT EXCEL -->
 <section class="section">
-    <h2>Xuất file Excel</h2>
+    <h2>Xuất dữ liệu thông số ra Excel (kèm thời gian truy xuất)</h2>
 
     <p class="muted">
-        File .xlsx gồm sheet <strong>Thông số</strong> (địa chỉ CH1/CH2 tách riêng,
-        giá trị CH1/CH2, mặc định NSX), sheet <strong>Thông tin</strong>
-        (Slave ID, baud, InTy, Unit) và sheet <strong>Realtime</strong>
-        (Ngày, Giờ, PV/SV/OUT/lỗi).
+        Sheet <strong>Thông số</strong> luôn được xuất (có Ngày/Giờ truy xuất từng thông số).
+        Chọn thêm các sheet khác bên dưới.
     </p>
 
-    <label class="option-check">
-        <input id="includeRealtime" type="checkbox" checked>
-        <span>Kèm sheet nhật ký realtime (tối đa 7200 dòng gần nhất)</span>
-    </label>
+    <div class="option-list">
+        <label class="option-check">
+            <input id="includeHistory" type="checkbox" checked>
+            <span>Lịch sử truy xuất</span>
+        </label>
+        <label class="option-check">
+            <input id="includeAlarms" type="checkbox" checked>
+            <span>Cảnh báo &amp; lỗi</span>
+        </label>
+        <label class="option-check">
+            <input id="includeRealtime" type="checkbox" checked>
+            <span>Realtime (tối đa 7200 dòng)</span>
+        </label>
+    </div>
 
     <div class="button-row">
         <button id="readExportButton" class="export-button" disabled>
             Đọc lại MTB &amp; xuất Excel
         </button>
-
         <button id="exportButton" class="export-button">
             Xuất Excel (dữ liệu đã đọc)
         </button>
-
         <button id="clearLogButton" class="clear-button">
             Xóa nhật ký realtime
         </button>
     </div>
 
     <div class="export-info muted">
-        Lần đọc thông số gần nhất: <strong id="lastReadInfo">Chưa đọc</strong>
-        &nbsp;|&nbsp;
-        Nhật ký realtime: <strong id="realtimeCount">0</strong> dòng
+        Lần truy xuất gần nhất: <strong id="lastReadInfo">Chưa đọc</strong>
+        &nbsp;|&nbsp; Số lần truy xuất: <strong id="readCount">0</strong>
+        &nbsp;|&nbsp; Nhật ký realtime: <strong id="realtimeCount">0</strong> dòng
+    </div>
+
+    <h3>Lịch sử truy xuất thông số (10 lần gần nhất)</h3>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Lần</th>
+                <th class="time-head">Ngày truy xuất</th>
+                <th class="time-head">Giờ bắt đầu</th>
+                <th class="time-head">Giờ kết thúc</th>
+                <th>Thời gian đọc (s)</th>
+                <th>Số thông số</th>
+                <th>Slave ID</th>
+            </tr>
+            </thead>
+            <tbody id="readHistoryBody"></tbody>
+        </table>
     </div>
 </section>
 
@@ -535,6 +673,8 @@
                 <th>Giá trị CH1</th>
                 <th>Giá trị CH2</th>
                 <th>Mặc định NSX</th>
+                <th class="time-head">Ngày truy xuất</th>
+                <th class="time-head">Giờ truy xuất</th>
             </tr>
             </thead>
             <tbody id="parameterTableBody"></tbody>
@@ -566,12 +706,19 @@ const INPUT_TYPES = {
     33: "An10", 34: "An20", 35: "An50"
 };
 
-/* Những loại input nhiệt độ có một số lẻ */
-const ONE_DECIMAL_INPUTS = new Set([
-    0, 1, 6, 7, 16, 17, 21, 22, 23, 27, 28, 29
-]);
-
+const ONE_DECIMAL_INPUTS = new Set([0, 1, 6, 7, 16, 17, 21, 22, 23, 27, 28, 29]);
 const ANALOG_INPUTS = new Set([33, 34, 35]);
+
+
+/* ========================================================
+   ĐỊNH NGHĨA BIT LỖI (thanh ghi 596/597)
+   Chỉ bit giá trị 4 = Open đã biết. Bổ sung các bit khác
+   theo tài liệu CONCH nếu có.
+======================================================== */
+
+const ERROR_BITS = {
+    4: { name: "Open", text: "Open – Hở/đứt cảm biến đầu vào", severity: "Lỗi" }
+};
 
 
 /* ========================================================
@@ -585,8 +732,6 @@ const PARAMETERS = [
     { key: "al2",   code: "AL2",   en: "Alarm 2 Value",              vi: "Giá trị cảnh báo 2",             address: 8,   format: "input",     unit: "Theo Unit", defaultValue: "0" },
     { key: "al3",   code: "AL3",   en: "Alarm 3 Value",              vi: "Giá trị cảnh báo 3",             address: 12,  format: "input",     unit: "Theo Unit", defaultValue: "0" },
     { key: "at",    code: "AT",    en: "Auto-Tuning",                vi: "Tự động dò PID",                 address: 16,  format: "yesNo",     unit: "0/1",       defaultValue: "No" },
-
-    /* P1/P2 là Proportional Band – độ rộng dải nhiệt, không phải phần trăm */
     { key: "p1",    code: "P1",    en: "Heating Proportional Band",  vi: "Dải nhiệt tỉ lệ gia nhiệt",      address: 20,  format: "input",     unit: "°C/°F",     defaultValue: "6" },
     { key: "i1",    code: "I1",    en: "Heating Integral Time",      vi: "Thời gian tích phân gia nhiệt",  address: 24,  format: "seconds",   unit: "s",         defaultValue: "240 s" },
     { key: "arw1",  code: "ARW1",  en: "Heating Anti-Reset Windup",  vi: "Giới hạn tích phân gia nhiệt",   address: 28,  format: "percent10", unit: "%",         defaultValue: "100.0 %" },
@@ -596,7 +741,6 @@ const PARAMETERS = [
     { key: "o1lo",  code: "O1Lo",  en: "Output 1 Low Limit",         vi: "Giới hạn dưới công suất OUT1",   address: 44,  format: "percent10", unit: "%",         defaultValue: "0.0 %" },
     { key: "o1hi",  code: "O1Hi",  en: "Output 1 High Limit",        vi: "Giới hạn trên công suất OUT1",   address: 48,  format: "percent10", unit: "%",         defaultValue: "100.0 %" },
     { key: "hys",   code: "HYS",   en: "ON-OFF Hysteresis",          vi: "Độ trễ điều khiển ON-OFF",       address: 52,  format: "input",     unit: "°C/°F",     defaultValue: "2" },
-
     { key: "p2",    code: "P2",    en: "Cooling Proportional Band",  vi: "Dải nhiệt tỉ lệ làm lạnh",       address: 56,  format: "input",     unit: "°C/°F",     defaultValue: "6" },
     { key: "i2",    code: "I2",    en: "Cooling Integral Time",      vi: "Thời gian tích phân làm lạnh",   address: 60,  format: "seconds",   unit: "s",         defaultValue: "240 s" },
     { key: "arw2",  code: "ARW2",  en: "Cooling Anti-Reset Windup",  vi: "Giới hạn tích phân làm lạnh",    address: 64,  format: "percent10", unit: "%",         defaultValue: "100.0 %" },
@@ -610,7 +754,6 @@ const PARAMETERS = [
     { key: "rmdn",  code: "RmDn",  en: "Ramp Down Rate",             vi: "Tốc độ giảm nhiệt",              address: 96,  format: "ramp100",   unit: "°C/phút",   defaultValue: "0.00" },
     { key: "prsv",  code: "Pr.Sv", en: "Pre-Heating Threshold",      vi: "Ngưỡng gia nhiệt khởi động",     address: 100, format: "input",     unit: "°C/°F",     defaultValue: "0" },
     { key: "prho",  code: "Pr.Ho", en: "Pre-Heating Output",         vi: "Công suất gia nhiệt khởi động",  address: 104, format: "percent10", unit: "%",         defaultValue: "0.0 %" },
-
     { key: "filr",  code: "FiLr",  en: "Input Filter",               vi: "Bộ lọc tín hiệu đầu vào",        address: 164, format: "decimal10", unit: "–",         defaultValue: "0.2" },
     { key: "pwon",  code: "Pw.On", en: "Power-On Mode",              vi: "Chế độ khi cấp nguồn",           address: 176, format: "powerMode", unit: "Mã",        defaultValue: "1 – PID Auto" },
     { key: "inty",  code: "InTy",  en: "Input Type",                 vi: "Loại cảm biến đầu vào",          address: 180, format: "inputType", unit: "Mã",        defaultValue: "2 – K3" },
@@ -624,9 +767,7 @@ const PARAMETERS = [
     { key: "dir",   code: "Dir",   en: "Control Direction",          vi: "Chế độ điều khiển",              address: 228, format: "direction", unit: "Mã",        defaultValue: "0 – HEAT" }
 ];
 
-const PARAMETER_MAP = Object.fromEntries(
-    PARAMETERS.map(item => [item.key, item])
-);
+const PARAMETER_MAP = Object.fromEntries(PARAMETERS.map(item => [item.key, item]));
 
 
 /* ========================================================
@@ -642,7 +783,7 @@ const WRITE_GROUPS = [
 
 
 /* ========================================================
-   CÁC ĐƯỜNG / CỘT TRÊN BIỂU ĐỒ
+   ĐƯỜNG / CỘT TRÊN BIỂU ĐỒ
 ======================================================== */
 
 const SERIES = [
@@ -650,8 +791,8 @@ const SERIES = [
     { id: "sv1",  label: "SV CH1",  color: "#86efac", type: "line", dash: [7, 5], channel: 0, get: e => e.sv[0] },
     { id: "pv2",  label: "PV CH2",  color: "#f59e0b", type: "line", dash: [],     channel: 1, get: e => e.pv[1] },
     { id: "sv2",  label: "SV CH2",  color: "#fcd34d", type: "line", dash: [7, 5], channel: 1, get: e => e.sv[1] },
-    { id: "out1", label: "OUT CH1", color: "rgba(56, 189, 248, 0.6)",  type: "bar", channel: 0, get: e => e.out[0] },
-    { id: "out2", label: "OUT CH2", color: "rgba(192, 132, 252, 0.6)", type: "bar", channel: 1, get: e => e.out[1] }
+    { id: "out1", label: "OUT CH1", color: "rgba(56, 189, 248, 0.6)",  solid: "#38bdf8", type: "bar", channel: 0, get: e => e.out[0] },
+    { id: "out2", label: "OUT CH2", color: "rgba(192, 132, 252, 0.6)", solid: "#c084fc", type: "bar", channel: 1, get: e => e.out[1] }
 ];
 
 const seriesVisible = Object.fromEntries(SERIES.map(s => [s.id, true]));
@@ -673,23 +814,39 @@ let inputType = [2, 2];
 let decimalPoint = [0, 0];
 let temperatureUnit = [0, 0];
 
-/* Dữ liệu thông số và nhật ký realtime */
-let parameterData = {};          // key -> [rawCH1, rawCH2]
+/* Thông số + thời gian truy xuất */
+let parameterData = {};        // key -> [rawCH1, rawCH2]
+let parameterReadTime = {};    // key -> Date
+let lastReadStart = null;
 let lastReadTime = null;
+const readHistory = [];
+const readHistoryLimit = 200;
+let readCounter = 0;
+
+/* Realtime */
 const realtimeLog = [];
 const realtimeLogLimit = 7200;
 
+/* Cảnh báo */
+const alarmHistory = [];
+const activeAlarms = new Map();
+const alarmLimit = 1000;
+let alarmCounter = 0;
+let commFailCount = 0;
+let audioContext = null;
+
 let hoverX = null;
 
-const connectButton = document.getElementById("connectButton");
-const readParameterButton = document.getElementById("readParameterButton");
-const readExportButton = document.getElementById("readExportButton");
-const exportButton = document.getElementById("exportButton");
-const clearLogButton = document.getElementById("clearLogButton");
-const enableWrite = document.getElementById("enableWrite");
-const statusElement = document.getElementById("status");
-const logElement = document.getElementById("log");
-const chartCanvas = document.getElementById("chart");
+const $ = id => document.getElementById(id);
+
+const connectButton = $("connectButton");
+const readParameterButton = $("readParameterButton");
+const readExportButton = $("readExportButton");
+const exportButton = $("exportButton");
+const enableWrite = $("enableWrite");
+const statusElement = $("status");
+const logElement = $("log");
+const chartCanvas = $("chart");
 
 
 /* ========================================================
@@ -700,9 +857,38 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function pad2(n) {
+    return String(n).padStart(2, "0");
+}
+
+function formatDate(d) {
+    return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()}`;
+}
+
+function formatTime(d) {
+    return `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
+
+function formatDateTime(d) {
+    if (!d) return "Chưa đọc";
+    return `${formatDate(d)} ${formatTime(d)}`;
+}
+
+function formatDuration(ms) {
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    return `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+}
+
+function fileTimestamp(d) {
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}_` +
+           `${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}`;
+}
+
 function addLog(message) {
-    const time = new Date().toLocaleTimeString("vi-VN");
-    logElement.textContent += `[${time}] ${message}\n`;
+    logElement.textContent += `[${formatDateTime(new Date())}] ${message}\n`;
 
     const lines = logElement.textContent.split("\n");
     if (lines.length > 300) {
@@ -731,7 +917,7 @@ function bytesToHex(bytes) {
 }
 
 function getSlaveId() {
-    return Number(document.getElementById("slaveId").value);
+    return Number($("slaveId").value);
 }
 
 function unitForChannel(channelIndex) {
@@ -753,27 +939,20 @@ function decimalCountForChannel(channelIndex) {
     return 0;
 }
 
-function pad2(n) {
-    return String(n).padStart(2, "0");
-}
 
-function formatDate(d) {
-    return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()}`;
-}
+/* ========================================================
+   ĐỒNG HỒ HỆ THỐNG
+======================================================== */
 
-function formatTime(d, withSeconds = true) {
-    const hm = `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-    return withSeconds ? `${hm}:${pad2(d.getSeconds())}` : hm;
-}
+const WEEKDAYS = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"];
 
-function formatDateTime(d) {
-    if (!d) return "Chưa đọc";
-    return `${formatDate(d)} ${formatTime(d)}`;
-}
+function tickClock() {
+    const now = new Date();
+    $("clockTime").textContent = formatTime(now);
+    $("clockDate").textContent = `${WEEKDAYS[now.getDay()]}, ${formatDate(now)}`;
 
-function fileTimestamp(d) {
-    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}_` +
-           `${pad2(d.getHours())}${pad2(d.getMinutes())}${pad2(d.getSeconds())}`;
+    /* Cập nhật thời lượng cảnh báo đang hoạt động mỗi giây */
+    if (activeAlarms.size) renderAlarms();
 }
 
 
@@ -1001,7 +1180,6 @@ function formatValue(raw, format, channelIndex) {
             return (signed / scaleForChannel(channelIndex))
                 .toFixed(decimalCountForChannel(channelIndex)) +
                 " " + unitForChannel(channelIndex);
-
         case "amp10":     return (signed / 10).toFixed(1) + " A";
         case "percent10": return (signed / 10).toFixed(1) + " %";
         case "decimal10": return (signed / 10).toFixed(1);
@@ -1013,7 +1191,6 @@ function formatValue(raw, format, channelIndex) {
         case "powerMode": return raw === 1 ? "1 – PID Auto" : "0 – Manual";
         case "inputType": return `${raw} – ${INPUT_TYPES[raw] ?? "Không rõ"}`;
         case "unit":      return raw === 1 ? "1 – °F" : "0 – °C";
-
         case "direction": {
             const options = {
                 0: "0 – HEAT / Gia nhiệt",
@@ -1023,19 +1200,29 @@ function formatValue(raw, format, channelIndex) {
             };
             return options[raw] ?? `Mã ${raw}`;
         }
-
         default:
             return String(signed);
     }
 }
 
+function decodeError(code) {
+    if (code === 0) return "Bình thường";
+
+    const parts = [];
+    for (let bit = 0; bit < 16; bit++) {
+        const mask = 1 << bit;
+        if (code & mask) parts.push(ERROR_BITS[mask]?.name ?? `bit ${bit}`);
+    }
+    return `${parts.join(", ")} (${code})`;
+}
+
 
 /* ========================================================
-   TẠO BẢNG VÀ GIAO DIỆN GHI
+   TẠO GIAO DIỆN
 ======================================================== */
 
 function createParameterTable() {
-    const tbody = document.getElementById("parameterTableBody");
+    const tbody = $("parameterTableBody");
     tbody.innerHTML = "";
 
     PARAMETERS.forEach(parameter => {
@@ -1053,6 +1240,8 @@ function createParameterTable() {
             <td id="table-${parameter.key}-ch1" class="current-value">Chưa đọc</td>
             <td id="table-${parameter.key}-ch2" class="current-value">Chưa đọc</td>
             <td class="default-value">${parameter.defaultValue}</td>
+            <td id="table-${parameter.key}-date" class="time-cell">–</td>
+            <td id="table-${parameter.key}-time" class="time-cell">–</td>
         `;
 
         tbody.appendChild(row);
@@ -1060,19 +1249,16 @@ function createParameterTable() {
 }
 
 function createWriteSections() {
-    const container = document.getElementById("writeSections");
+    const container = $("writeSections");
     container.innerHTML = "";
 
     WRITE_GROUPS.forEach(group => {
         const section = document.createElement("section");
         section.className = "section";
 
-        let rows = "";
-
-        group.keys.forEach(key => {
+        const rows = group.keys.map(key => {
             const parameter = PARAMETER_MAP[key];
-
-            rows += `
+            return `
                 <tr>
                     <td class="parameter-code">${parameter.code}</td>
                     <td class="description">
@@ -1082,16 +1268,12 @@ function createWriteSections() {
                     <td>${parameter.unit}</td>
                     <td class="address">${parameter.address}</td>
                     <td class="address">${parameter.address + 1}</td>
-                    <td>
-                        <input id="write-${key}-ch1" type="number" step="any" placeholder="CH1">
-                    </td>
-                    <td>
-                        <input id="write-${key}-ch2" type="number" step="any" placeholder="CH2">
-                    </td>
+                    <td><input id="write-${key}-ch1" type="number" step="any" placeholder="CH1"></td>
+                    <td><input id="write-${key}-ch2" type="number" step="any" placeholder="CH2"></td>
                     <td class="default-value">${parameter.defaultValue}</td>
                 </tr>
             `;
-        });
+        }).join("");
 
         section.innerHTML = `
             <h2>${group.title}</h2>
@@ -1129,7 +1311,7 @@ function createWriteSections() {
 }
 
 function createChartLegend() {
-    const legend = document.getElementById("chartLegend");
+    const legend = $("chartLegend");
     legend.innerHTML = "";
 
     SERIES.forEach(series => {
@@ -1147,7 +1329,7 @@ function createChartLegend() {
         }
 
         item.innerHTML = `
-            <input type="checkbox" ${seriesVisible[series.id] ? "checked" : ""}>
+            <input type="checkbox" checked>
             <span class="${swatchClass}" style="${swatchStyle}"></span>
             <span>${series.label}${series.type === "bar" ? " (cột)" : ""}</span>
         `;
@@ -1167,10 +1349,10 @@ function createChartLegend() {
 ======================================================== */
 
 function updateUnitHeaders() {
-    document.getElementById("headPv1").textContent = `PV (${unitForChannel(0)})`;
-    document.getElementById("headSv1").textContent = `SV (${unitForChannel(0)})`;
-    document.getElementById("headPv2").textContent = `PV (${unitForChannel(1)})`;
-    document.getElementById("headSv2").textContent = `SV (${unitForChannel(1)})`;
+    $("headPv1").textContent = `PV (${unitForChannel(0)})`;
+    $("headSv1").textContent = `SV (${unitForChannel(0)})`;
+    $("headPv2").textContent = `PV (${unitForChannel(1)})`;
+    $("headSv2").textContent = `SV (${unitForChannel(1)})`;
 }
 
 async function readInputConfiguration() {
@@ -1184,20 +1366,28 @@ async function readInputConfiguration() {
 
     for (let channel = 0; channel < 2; channel++) {
         const n = channel + 1;
-
-        document.getElementById(`ch${n}InputType`).textContent =
-            INPUT_TYPES[inputType[channel]] ?? `Mã ${inputType[channel]}`;
-
-        document.getElementById(`ch${n}Unit`).textContent =
-            unitForChannel(channel);
-
-        document.getElementById(`ch${n}Scale`).textContent =
-            `Raw ÷ ${scaleForChannel(channel)}`;
+        $(`ch${n}InputType`).textContent = INPUT_TYPES[inputType[channel]] ?? `Mã ${inputType[channel]}`;
+        $(`ch${n}Unit`).textContent = unitForChannel(channel);
+        $(`ch${n}Scale`).textContent = `Raw ÷ ${scaleForChannel(channel)}`;
     }
 
     updateUnitHeaders();
-
     addLog(`CH1 InTy=${INPUT_TYPES[inputType[0]]}, CH2 InTy=${INPUT_TYPES[inputType[1]]}`);
+}
+
+
+/* ========================================================
+   CẬP NHẬT 1 DÒNG THÔNG SỐ + THỜI GIAN TRUY XUẤT
+======================================================== */
+
+function updateParameterRow(parameter, values, time) {
+    parameterData[parameter.key] = [values[0], values[1]];
+    parameterReadTime[parameter.key] = time;
+
+    $(`table-${parameter.key}-ch1`).textContent = formatValue(values[0], parameter.format, 0);
+    $(`table-${parameter.key}-ch2`).textContent = formatValue(values[1], parameter.format, 1);
+    $(`table-${parameter.key}-date`).textContent = formatDate(time);
+    $(`table-${parameter.key}-time`).textContent = formatTime(time);
 }
 
 
@@ -1230,10 +1420,10 @@ async function readWriteGroup(groupId) {
             const parameter = PARAMETER_MAP[key];
             const values = await readHoldingRegisters(parameter.address, 2);
 
-            parameterData[key] = [values[0], values[1]];
+            updateParameterRow(parameter, values, new Date());
 
             for (let channel = 0; channel < 2; channel++) {
-                document.getElementById(`write-${key}-ch${channel + 1}`).value =
+                $(`write-${key}-ch${channel + 1}`).value =
                     decodeValue(values[channel], parameter.format, channel);
             }
 
@@ -1268,7 +1458,7 @@ async function writeGroup(groupId) {
         const parameter = PARAMETER_MAP[key];
 
         for (let channel = 0; channel < 2; channel++) {
-            const input = document.getElementById(`write-${key}-ch${channel + 1}`);
+            const input = $(`write-${key}-ch${channel + 1}`);
             const displayValue = Number(input.value);
 
             if (input.value.trim() === "" || !Number.isFinite(displayValue)) {
@@ -1284,13 +1474,7 @@ async function writeGroup(groupId) {
                 return;
             }
 
-            jobs.push({
-                parameter,
-                channel,
-                displayValue,
-                rawValue,
-                address: parameter.address + channel
-            });
+            jobs.push({ parameter, channel, displayValue, rawValue, address: parameter.address + channel });
         }
     }
 
@@ -1299,9 +1483,7 @@ async function writeGroup(groupId) {
         `   (mặc định NSX: ${job.parameter.defaultValue})`
     ).join("\n");
 
-    if (!confirm("Bạn sắp ghi:\n\n" + summary + "\n\nTiếp tục?")) {
-        return;
-    }
+    if (!confirm("Bạn sắp ghi:\n\n" + summary + "\n\nTiếp tục?")) return;
 
     operationBusy = true;
     await waitForPendingRequest();
@@ -1339,7 +1521,7 @@ async function writeGroup(groupId) {
 
 
 /* ========================================================
-   ĐỌC TOÀN BỘ BẢNG
+   ĐỌC TOÀN BỘ THÔNG SỐ (lưu lịch sử truy xuất)
 ======================================================== */
 
 async function readAllParameters() {
@@ -1354,31 +1536,41 @@ async function readAllParameters() {
     readExportButton.disabled = true;
 
     let success = false;
+    const startTime = new Date();
 
     try {
         await readInputConfiguration();
 
-        const newData = {};
-
         for (const parameter of PARAMETERS) {
             const values = await readHoldingRegisters(parameter.address, 2);
-
-            newData[parameter.key] = [values[0], values[1]];
-
-            document.getElementById(`table-${parameter.key}-ch1`).textContent =
-                formatValue(values[0], parameter.format, 0);
-
-            document.getElementById(`table-${parameter.key}-ch2`).textContent =
-                formatValue(values[1], parameter.format, 1);
-
+            updateParameterRow(parameter, values, new Date());
             await sleep(70);
         }
 
-        parameterData = newData;
+        lastReadStart = startTime;
         lastReadTime = new Date();
-        document.getElementById("lastReadInfo").textContent = formatDateTime(lastReadTime);
 
-        setStatus("Đã đọc xong tất cả thông số", "online");
+        /* Lưu bản chụp để xuất sheet Lịch sử truy xuất */
+        readHistory.push({
+            index: ++readCounter,
+            start: lastReadStart,
+            end: lastReadTime,
+            slaveId: getSlaveId(),
+            rows: PARAMETERS.map(parameter => ({
+                parameter,
+                v1: exportValue(parameter, 0),
+                v2: exportValue(parameter, 1),
+                time: parameterReadTime[parameter.key]
+            }))
+        });
+
+        if (readHistory.length > readHistoryLimit) readHistory.shift();
+
+        $("lastReadInfo").textContent = formatDateTime(lastReadTime);
+        $("readCount").textContent = readCounter;
+        renderReadHistory();
+
+        setStatus(`Đã truy xuất thông số lúc ${formatDateTime(lastReadTime)}`, "online");
         success = true;
 
     } catch (error) {
@@ -1393,30 +1585,232 @@ async function readAllParameters() {
     return success;
 }
 
+function renderReadHistory() {
+    const tbody = $("readHistoryBody");
+
+    if (!readHistory.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="muted">Chưa có lần truy xuất nào</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = readHistory.slice(-10).reverse().map(snap => `
+        <tr>
+            <td class="mono">${snap.index}</td>
+            <td class="time-cell">${formatDate(snap.start)}</td>
+            <td class="time-cell">${formatTime(snap.start)}</td>
+            <td class="time-cell">${formatTime(snap.end)}</td>
+            <td class="mono">${((snap.end - snap.start) / 1000).toFixed(1)}</td>
+            <td class="mono">${snap.rows.length}</td>
+            <td class="mono">${snap.slaveId}</td>
+        </tr>
+    `).join("");
+}
+
+
+/* ========================================================
+   CẢNH BÁO & LỖI
+======================================================== */
+
+function beep() {
+    if (!$("soundEnable").checked) return;
+
+    try {
+        audioContext = audioContext || new AudioContext();
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.frequency.value = 880;
+        gain.gain.value = 0.08;
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.35);
+    } catch (_) {}
+}
+
+function raiseAlarm(key, channel, code, message, severity) {
+    if (activeAlarms.has(key)) return;
+
+    const alarm = {
+        id: ++alarmCounter,
+        key, channel, code, message, severity,
+        start: new Date(),
+        end: null,
+        ack: null,
+        note: ""
+    };
+
+    alarmHistory.push(alarm);
+    activeAlarms.set(key, alarm);
+
+    while (alarmHistory.length > alarmLimit) {
+        const index = alarmHistory.findIndex(a => a.end);
+        if (index < 0) break;
+        alarmHistory.splice(index, 1);
+    }
+
+    addLog(`ALARM ON  [${channel}] ${code}: ${message}`);
+    beep();
+    renderAlarms();
+}
+
+function clearAlarm(key, note = "") {
+    const alarm = activeAlarms.get(key);
+    if (!alarm) return;
+
+    alarm.end = new Date();
+    alarm.note = note;
+    activeAlarms.delete(key);
+
+    addLog(`ALARM OFF [${alarm.channel}] ${alarm.code} – thời lượng ${formatDuration(alarm.end - alarm.start)}`);
+    renderAlarms();
+}
+
+function evaluateSensorAlarms(errors) {
+    for (let channel = 0; channel < 2; channel++) {
+        for (let bit = 0; bit < 16; bit++) {
+            const mask = 1 << bit;
+            const key = `ch${channel + 1}-m${mask}`;
+
+            if (errors[channel] & mask) {
+                const def = ERROR_BITS[mask];
+                raiseAlarm(
+                    key,
+                    `CH${channel + 1}`,
+                    def ? def.name.toUpperCase() : `BIT${bit}`,
+                    def ? def.text : `Lỗi không xác định – bit ${bit} (giá trị ${mask})`,
+                    def ? def.severity : "Cảnh báo"
+                );
+            } else if (activeAlarms.has(key)) {
+                clearAlarm(key);
+            }
+        }
+    }
+}
+
+function acknowledgeAlarm(id) {
+    const alarm = alarmHistory.find(a => a.id === id);
+    if (alarm && !alarm.ack) {
+        alarm.ack = new Date();
+        addLog(`ACK cảnh báo #${id} [${alarm.channel}] ${alarm.code}`);
+    }
+    renderAlarms();
+}
+
+function acknowledgeAll() {
+    const now = new Date();
+    let count = 0;
+
+    alarmHistory.forEach(alarm => {
+        if (!alarm.ack) {
+            alarm.ack = now;
+            count++;
+        }
+    });
+
+    if (count) addLog(`ACK ${count} cảnh báo`);
+    renderAlarms();
+}
+
+function clearEndedAlarms() {
+    const ended = alarmHistory.filter(a => a.end).length;
+    if (!ended) return;
+    if (!confirm(`Xóa ${ended} cảnh báo đã kết thúc khỏi lịch sử?`)) return;
+
+    for (let i = alarmHistory.length - 1; i >= 0; i--) {
+        if (alarmHistory[i].end) alarmHistory.splice(i, 1);
+    }
+    renderAlarms();
+}
+
+function alarmStatusText(alarm) {
+    const state = alarm.end ? "Đã kết thúc" : "Đang hoạt động";
+    const ack = alarm.ack ? "đã xác nhận" : "chưa xác nhận";
+    return `${state} – ${ack}${alarm.note ? ` (${alarm.note})` : ""}`;
+}
+
+function alarmRowClass(alarm) {
+    if (!alarm.end && !alarm.ack) return "alarm-active-unack";
+    if (!alarm.end) return "alarm-active";
+    if (!alarm.ack) return "alarm-cleared-unack";
+    return "alarm-cleared";
+}
+
+function renderAlarms() {
+    const now = new Date();
+    const active = alarmHistory.filter(a => !a.end);
+    const unack = alarmHistory.filter(a => !a.ack);
+    const activeUnack = active.filter(a => !a.ack);
+
+    $("alarmActiveCount").textContent = active.length;
+    $("alarmUnackCount").textContent = unack.length;
+    $("alarmTotalCount").textContent = alarmHistory.length;
+
+    /* Thanh báo động */
+    const banner = $("alarmBanner");
+
+    if (active.length) {
+        const latest = active[active.length - 1];
+        banner.className = "alarm-banner active" + (activeUnack.length ? " blink" : "");
+        banner.textContent =
+            `CẢNH BÁO: ${active.length} lỗi đang hoạt động` +
+            (activeUnack.length ? ` (${activeUnack.length} chưa xác nhận)` : "") +
+            ` – Mới nhất: ${formatDate(latest.start)} ${formatTime(latest.start)}` +
+            ` [${latest.channel}] ${latest.message}`;
+    } else {
+        banner.className = "alarm-banner ok";
+        banner.textContent = `Hệ thống bình thường – không có cảnh báo đang hoạt động` +
+            (unack.length ? ` (${unack.length} cảnh báo cũ chưa xác nhận)` : "");
+    }
+
+    /* Bảng lịch sử */
+    const filter = $("alarmFilter").value;
+    const list = alarmHistory.filter(alarm => {
+        if (filter === "active") return !alarm.end;
+        if (filter === "unack") return !alarm.ack;
+        if (filter === "cleared") return !!alarm.end;
+        return true;
+    }).reverse();
+
+    const tbody = $("alarmTableBody");
+
+    if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="14" class="muted">Không có cảnh báo</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = list.map(alarm => `
+        <tr class="${alarmRowClass(alarm)}">
+            <td class="mono">${alarm.id}</td>
+            <td class="time-cell">${formatDate(alarm.start)}</td>
+            <td class="time-cell">${formatTime(alarm.start)}</td>
+            <td class="time-cell">${alarm.end ? formatDate(alarm.end) : "–"}</td>
+            <td class="time-cell">${alarm.end ? formatTime(alarm.end) : "–"}</td>
+            <td class="mono">${formatDuration((alarm.end || now) - alarm.start)}</td>
+            <td><strong>${alarm.channel}</strong></td>
+            <td class="mono">${alarm.code}</td>
+            <td class="description">${alarm.message}</td>
+            <td class="${alarm.severity === "Lỗi" ? "sev-error" : "sev-warn"}">${alarm.severity}</td>
+            <td>${alarmStatusText(alarm)}</td>
+            <td class="time-cell">${alarm.ack ? formatDate(alarm.ack) : "–"}</td>
+            <td class="time-cell">${alarm.ack ? formatTime(alarm.ack) : "–"}</td>
+            <td>${alarm.ack ? "–" : `<button class="ack-button small" data-ack="${alarm.id}">ACK</button>`}</td>
+        </tr>
+    `).join("");
+}
+
 
 /* ========================================================
    REALTIME
 ======================================================== */
 
-function decodeError(code) {
-    if (code === 0) return "Bình thường";
-
-    const messages = [];
-    if (code & 4) messages.push("Open");
-
-    return messages.length
-        ? `${messages.join(", ")} (${code})`
-        : `Mã ${code}`;
-}
-
 function showError(id, code) {
-    const element = document.getElementById(id);
+    const element = $(id);
     element.textContent = decodeError(code);
     element.className = code === 0 ? "normal" : "fault";
 }
 
 function showPv(id, raw, error, channel) {
-    const element = document.getElementById(id);
+    const element = $(id);
 
     if (error & 4) {
         element.textContent = "OPEN";
@@ -1428,10 +1822,6 @@ function showPv(id, raw, error, channel) {
     element.className = "temperature";
 }
 
-function updateRealtimeCount() {
-    document.getElementById("realtimeCount").textContent = realtimeLog.length;
-}
-
 async function readRealtimeData() {
     if (operationBusy) return;
 
@@ -1440,38 +1830,32 @@ async function readRealtimeData() {
     const pv = await readHoldingRegisters(588, 2);
     const error = await readHoldingRegisters(596, 2);
 
-    document.getElementById("ch1Sv").textContent = formatValue(sv[0], "input", 0);
-    document.getElementById("ch2Sv").textContent = formatValue(sv[1], "input", 1);
-
-    document.getElementById("ch1Out").textContent = `${(toSigned16(output[0]) / 10).toFixed(1)} %`;
-    document.getElementById("ch2Out").textContent = `${(toSigned16(output[1]) / 10).toFixed(1)} %`;
+    $("ch1Sv").textContent = formatValue(sv[0], "input", 0);
+    $("ch2Sv").textContent = formatValue(sv[1], "input", 1);
+    $("ch1Out").textContent = `${(toSigned16(output[0]) / 10).toFixed(1)} %`;
+    $("ch2Out").textContent = `${(toSigned16(output[1]) / 10).toFixed(1)} %`;
 
     showError("ch1Error", error[0]);
     showError("ch2Error", error[1]);
-
     showPv("ch1Pv", pv[0], error[0], 0);
     showPv("ch2Pv", pv[1], error[1], 1);
 
-    /* Lưu vào nhật ký realtime (biểu đồ, bảng và Excel dùng chung) */
+    evaluateSensorAlarms(error);
+
     realtimeLog.push({
         time: new Date(),
         pv: [
             (error[0] & 4) ? null : decodeValue(pv[0], "input", 0),
             (error[1] & 4) ? null : decodeValue(pv[1], "input", 1)
         ],
-        sv: [
-            decodeValue(sv[0], "input", 0),
-            decodeValue(sv[1], "input", 1)
-        ],
+        sv: [decodeValue(sv[0], "input", 0), decodeValue(sv[1], "input", 1)],
         out: [toSigned16(output[0]) / 10, toSigned16(output[1]) / 10],
         err: [error[0], error[1]]
     });
 
-    if (realtimeLog.length > realtimeLogLimit) {
-        realtimeLog.shift();
-    }
+    if (realtimeLog.length > realtimeLogLimit) realtimeLog.shift();
 
-    updateRealtimeCount();
+    $("realtimeCount").textContent = realtimeLog.length;
     drawChart();
     renderRealtimeTable();
 
@@ -1485,13 +1869,23 @@ async function pollingLoop() {
         if (!operationBusy) {
             try {
                 await readRealtimeData();
+                commFailCount = 0;
+                clearAlarm("comm");
             } catch (error) {
+                if (!connected) break;
+
+                commFailCount++;
                 addLog(`Lỗi realtime: ${error.message}`);
                 setStatus(error.message, "error");
+
+                if (commFailCount >= 3) {
+                    raiseAlarm("comm", "Hệ thống", "COMM",
+                        `Mất truyền thông Modbus – ${error.message}`, "Lỗi");
+                }
             }
         }
 
-        const interval = Number(document.getElementById("pollInterval").value);
+        const interval = Number($("pollInterval").value);
         await sleep(Math.max(100, interval - (Date.now() - start)));
     }
 }
@@ -1506,12 +1900,8 @@ function channelCells(entry, channel) {
     const pv = entry.pv[channel];
     const err = entry.err[channel];
 
-    const pvText = pv === null
-        ? `<span class="fault"><strong>OPEN</strong></span>`
-        : pv.toFixed(digits);
-
     return `
-        <td class="current-value">${pvText}</td>
+        <td class="current-value">${pv === null ? `<span class="fault">OPEN</span>` : pv.toFixed(digits)}</td>
         <td class="mono">${entry.sv[channel].toFixed(digits)}</td>
         <td class="mono">${entry.out[channel].toFixed(1)}</td>
         <td class="${err === 0 ? "normal" : "fault"}">${decodeError(err)}</td>
@@ -1519,22 +1909,21 @@ function channelCells(entry, channel) {
 }
 
 function renderRealtimeTable() {
-    const tbody = document.getElementById("realtimeTableBody");
-    const limit = Number(document.getElementById("tableRows").value);
+    const tbody = $("realtimeTableBody");
+    const limit = Number($("tableRows").value);
 
     if (!realtimeLog.length) {
         tbody.innerHTML = `<tr><td colspan="11" class="muted">Chưa có dữ liệu realtime</td></tr>`;
         return;
     }
 
-    const rows = realtimeLog.slice(-limit).reverse();
     const total = realtimeLog.length;
 
-    tbody.innerHTML = rows.map((entry, index) => `
+    tbody.innerHTML = realtimeLog.slice(-limit).reverse().map((entry, index) => `
         <tr>
             <td class="mono">${total - index}</td>
-            <td class="mono">${formatDate(entry.time)}</td>
-            <td class="mono">${formatTime(entry.time)}</td>
+            <td class="time-cell">${formatDate(entry.time)}</td>
+            <td class="time-cell">${formatTime(entry.time)}</td>
             ${channelCells(entry, 0)}
             ${channelCells(entry, 1)}
         </tr>
@@ -1543,22 +1932,27 @@ function renderRealtimeTable() {
 
 
 /* ========================================================
-   BIỂU ĐỒ THỜI GIAN THỰC (trục ngang = ngày giờ)
+   BIỂU ĐỒ NHIỆT ĐỘ – TRỤC NGANG NGÀY GIỜ PHÚT GIÂY
 ======================================================== */
 
 const TIME_STEPS = [
-    1, 2, 5, 10, 15, 30,
-    60, 120, 300, 600, 900, 1800,
+    1, 2, 5, 10, 15, 20, 30,
+    60, 120, 300, 600, 900, 1200, 1800,
     3600, 7200, 10800, 21600, 43200, 86400
 ].map(seconds => seconds * 1000);
 
 function chooseTimeStep(rangeMs, plotWidth) {
-    const maxTicks = Math.max(2, Math.floor(plotWidth / 105));
-
+    const maxTicks = Math.max(2, Math.floor(plotWidth / 115));
     for (const step of TIME_STEPS) {
         if (rangeMs / step <= maxTicks) return step;
     }
     return TIME_STEPS[TIME_STEPS.length - 1];
+}
+
+function stepLabel(step) {
+    if (step < 60000) return `${step / 1000} giây`;
+    if (step < 3600000) return `${step / 60000} phút`;
+    return `${step / 3600000} giờ`;
 }
 
 function prepareCanvas() {
@@ -1574,7 +1968,6 @@ function prepareCanvas() {
 
     const ctx = chartCanvas.getContext("2d");
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
     return { ctx, width, height };
 }
 
@@ -1588,42 +1981,37 @@ function drawChart() {
     if (!realtimeLog.length) {
         ctx.fillStyle = "#94a3b8";
         ctx.font = "18px Arial";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
         ctx.fillText("Chưa có dữ liệu – hãy kết nối MTB", 30, 50);
         return;
     }
 
     /* ---- Khoảng thời gian ---- */
-    const windowMs = Number(document.getElementById("timeWindow").value);
+    const windowMs = Number($("timeWindow").value);
     const tMax = realtimeLog[realtimeLog.length - 1].time.getTime();
     let tMin = windowMs > 0 ? tMax - windowMs : realtimeLog[0].time.getTime();
-
     if (tMax - tMin < 10000) tMin = tMax - 10000;
 
     const data = realtimeLog.filter(entry => entry.time.getTime() >= tMin);
 
     /* ---- Vùng vẽ ---- */
-    const left = 70;
-    const right = 62;
-    const top = 22;
-    const bottom = 62;
+    const left = 72, right = 64, top = 40, bottom = 80;
     const plotW = width - left - right;
     const plotH = height - top - bottom;
 
-    /* ---- Thang nhiệt độ (trục trái) ---- */
     const lineSeries = SERIES.filter(s => s.type === "line" && seriesVisible[s.id]);
     const barSeries = SERIES.filter(s => s.type === "bar" && seriesVisible[s.id]);
 
+    /* ---- Thang nhiệt độ ---- */
     const tempValues = [];
-    data.forEach(entry => {
-        lineSeries.forEach(series => {
-            const value = series.get(entry);
-            if (value !== null && Number.isFinite(value)) tempValues.push(value);
-        });
-    });
+    data.forEach(entry => lineSeries.forEach(series => {
+        const value = series.get(entry);
+        if (value !== null && Number.isFinite(value)) tempValues.push(value);
+    }));
 
     let yMin = tempValues.length ? Math.min(...tempValues) : 0;
     let yMax = tempValues.length ? Math.max(...tempValues) : 100;
-
     if (yMin === yMax) { yMin -= 1; yMax += 1; }
 
     const margin = Math.max(0.5, (yMax - yMin) * 0.12);
@@ -1635,6 +2023,23 @@ function drawChart() {
     const xOf = t => left + (t - tMin) / (tMax - tMin) * plotW;
     const yTemp = v => top + (yMax - v) / (yMax - yMin) * plotH;
     const yPct = v => top + (100 - Math.min(100, Math.max(0, v))) / 100 * plotH;
+
+    const step = chooseTimeStep(tMax - tMin, plotW);
+
+    /* ---- Dòng thông tin phía trên ---- */
+    ctx.font = "bold 13px Consolas, monospace";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#e2e8f0";
+    ctx.fillText(
+        `Từ ${formatDateTime(new Date(tMin))}  →  Đến ${formatDateTime(new Date(tMax))}`,
+        left, 16
+    );
+
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "12px Consolas, monospace";
+    ctx.fillText(`${data.length} điểm | Mốc chia: ${stepLabel(step)}`, left + plotW, 16);
 
     /* ---- Lưới ngang + nhãn 2 trục Y ---- */
     ctx.lineWidth = 1;
@@ -1649,9 +2054,9 @@ function drawChart() {
         ctx.lineTo(left + plotW, y);
         ctx.stroke();
 
-        ctx.fillStyle = "#94a3b8";
-        ctx.textAlign = "right";
         ctx.textBaseline = "middle";
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#94a3b8";
         ctx.fillText((yMax - row / 5 * (yMax - yMin)).toFixed(tempDigits), left - 8, y);
 
         ctx.textAlign = "left";
@@ -1659,20 +2064,16 @@ function drawChart() {
         ctx.fillText(`${100 - row * 20}%`, left + plotW + 8, y);
     }
 
-    /* Tên trục */
-    ctx.fillStyle = "#cbd5e1";
     ctx.font = "bold 12px Arial";
-    ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#cbd5e1";
     ctx.fillText(unitForChannel(0), 8, top - 6);
     ctx.textAlign = "right";
     ctx.fillText("OUT %", width - 6, top - 6);
 
-    /* ---- Trục ngang: ngày + giờ ---- */
-    const step = chooseTimeStep(tMax - tMin, plotW);
+    /* ---- Trục ngang: giờ:phút:giây + ngày/tháng/năm ---- */
     const tzOffset = -new Date().getTimezoneOffset() * 60000;
-    const showSeconds = step < 60000;
-
     let tick = Math.ceil((tMin + tzOffset) / step) * step - tzOffset;
 
     ctx.textAlign = "center";
@@ -1691,38 +2092,57 @@ function drawChart() {
         ctx.strokeStyle = "#64748b";
         ctx.beginPath();
         ctx.moveTo(x, top + plotH);
-        ctx.lineTo(x, top + plotH + 5);
+        ctx.lineTo(x, top + plotH + 6);
         ctx.stroke();
 
         ctx.fillStyle = "#e2e8f0";
         ctx.font = "bold 12px Consolas, monospace";
-        ctx.fillText(formatTime(d, showSeconds), x, top + plotH + 9);
+        ctx.fillText(formatTime(d), x, top + plotH + 10);
 
         ctx.fillStyle = "#94a3b8";
         ctx.font = "11px Consolas, monospace";
-        ctx.fillText(formatDate(d), x, top + plotH + 26);
+        ctx.fillText(formatDate(d), x, top + plotH + 27);
     }
 
-    /* Khung vùng vẽ */
     ctx.strokeStyle = "#475569";
     ctx.strokeRect(left, top, plotW, plotH);
 
     ctx.fillStyle = "#94a3b8";
     ctx.font = "12px Arial";
-    ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
-    ctx.fillText("Ngày giờ", left + plotW / 2, height - 4);
+    ctx.fillText("Thời gian (giờ:phút:giây – ngày/tháng/năm)", left + plotW / 2, height - 8);
 
-    /* ---- Vẽ dữ liệu (cắt trong vùng vẽ) ---- */
+    /* ---- Vẽ dữ liệu trong vùng vẽ ---- */
     ctx.save();
     ctx.beginPath();
     ctx.rect(left, top, plotW, plotH);
     ctx.clip();
 
+    const pollMs = Number($("pollInterval").value);
+    const spacing = plotW * pollMs / (tMax - tMin);
+
+    /* Vùng lỗi (nền đỏ CH1 / cam CH2) */
+    if ($("showAlarmZones").checked) {
+        const zoneColors = ["rgba(239, 68, 68, 0.16)", "rgba(249, 115, 22, 0.16)"];
+
+        for (let channel = 0; channel < 2; channel++) {
+            ctx.fillStyle = zoneColors[channel];
+
+            data.forEach((entry, index) => {
+                if (entry.err[channel] === 0) return;
+
+                const x1 = xOf(entry.time.getTime());
+                const x2 = index + 1 < data.length
+                    ? xOf(data[index + 1].time.getTime())
+                    : x1 + Math.max(3, spacing);
+
+                ctx.fillRect(x1, top, x2 - x1, plotH);
+            });
+        }
+    }
+
     /* Cột OUT % */
-    if (barSeries.length && data.length) {
-        const pollMs = Number(document.getElementById("pollInterval").value);
-        const spacing = plotW * pollMs / (tMax - tMin);
+    if (barSeries.length) {
         const barW = Math.max(1, Math.min(14, spacing * 0.8 / barSeries.length));
 
         barSeries.forEach((series, index) => {
@@ -1740,7 +2160,7 @@ function drawChart() {
         });
     }
 
-    /* Đường PV / SV (ngắt quãng khi OPEN) */
+    /* Đường PV / SV – ngắt quãng khi OPEN */
     lineSeries.forEach(series => {
         ctx.strokeStyle = series.color;
         ctx.lineWidth = series.dash.length ? 2 : 2.5;
@@ -1760,18 +2180,13 @@ function drawChart() {
             const x = xOf(entry.time.getTime());
             const y = yTemp(value);
 
-            if (!started) {
-                ctx.moveTo(x, y);
-                started = true;
-            } else {
-                ctx.lineTo(x, y);
-            }
+            if (!started) { ctx.moveTo(x, y); started = true; }
+            else ctx.lineTo(x, y);
         });
 
         ctx.stroke();
         ctx.setLineDash([]);
 
-        /* Chấm điểm mới nhất */
         const last = data[data.length - 1];
         const lastValue = last ? series.get(last) : null;
 
@@ -1785,70 +2200,73 @@ function drawChart() {
 
     ctx.restore();
 
-    /* ---- Con trỏ và tooltip khi rê chuột ---- */
-    if (hoverX !== null && hoverX >= left && hoverX <= left + plotW && data.length) {
-        const hoverTime = tMin + (hoverX - left) / plotW * (tMax - tMin);
+    /* ---- Con trỏ + tooltip ---- */
+    if (hoverX === null || hoverX < left || hoverX > left + plotW || !data.length) return;
 
-        let nearest = data[0];
-        for (const entry of data) {
-            if (Math.abs(entry.time.getTime() - hoverTime) <
-                Math.abs(nearest.time.getTime() - hoverTime)) {
-                nearest = entry;
-            }
+    const hoverTime = tMin + (hoverX - left) / plotW * (tMax - tMin);
+    let nearest = data[0];
+
+    for (const entry of data) {
+        if (Math.abs(entry.time.getTime() - hoverTime) <
+            Math.abs(nearest.time.getTime() - hoverTime)) {
+            nearest = entry;
         }
-
-        const x = xOf(nearest.time.getTime());
-
-        ctx.strokeStyle = "#e2e8f0";
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(x, top);
-        ctx.lineTo(x, top + plotH);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        const lines = [{ text: formatDateTime(nearest.time), color: "#f8fafc", bold: true }];
-
-        SERIES.forEach(series => {
-            if (!seriesVisible[series.id]) return;
-
-            const value = series.get(nearest);
-            let text;
-
-            if (series.type === "bar") {
-                text = `${series.label}: ${value.toFixed(1)} %`;
-            } else if (value === null) {
-                text = `${series.label}: OPEN`;
-            } else {
-                text = `${series.label}: ${value.toFixed(decimalCountForChannel(series.channel))} ${unitForChannel(series.channel)}`;
-            }
-
-            lines.push({ text, color: series.color.startsWith("rgba")
-                ? series.color.replace(/[\d.]+\)$/, "1)")
-                : series.color });
-        });
-
-        const boxW = 200;
-        const boxH = 12 + lines.length * 18;
-        let boxX = x + 12;
-        if (boxX + boxW > left + plotW) boxX = x - boxW - 12;
-        const boxY = top + 8;
-
-        ctx.fillStyle = "rgba(2, 6, 23, 0.92)";
-        ctx.strokeStyle = "#475569";
-        ctx.fillRect(boxX, boxY, boxW, boxH);
-        ctx.strokeRect(boxX, boxY, boxW, boxH);
-
-        ctx.textAlign = "left";
-        ctx.textBaseline = "top";
-
-        lines.forEach((line, index) => {
-            ctx.font = line.bold ? "bold 12px Consolas, monospace" : "12px Consolas, monospace";
-            ctx.fillStyle = line.color;
-            ctx.fillText(line.text, boxX + 10, boxY + 7 + index * 18);
-        });
     }
+
+    const x = xOf(nearest.time.getTime());
+
+    ctx.strokeStyle = "#e2e8f0";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(x, top);
+    ctx.lineTo(x, top + plotH);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const lines = [
+        { text: `Ngày: ${formatDate(nearest.time)}`, color: "#f8fafc", bold: true },
+        { text: `Giờ : ${formatTime(nearest.time)}`, color: "#f8fafc", bold: true }
+    ];
+
+    SERIES.forEach(series => {
+        if (!seriesVisible[series.id]) return;
+
+        const value = series.get(nearest);
+        let text;
+
+        if (series.type === "bar") text = `${series.label}: ${value.toFixed(1)} %`;
+        else if (value === null) text = `${series.label}: OPEN`;
+        else text = `${series.label}: ${value.toFixed(decimalCountForChannel(series.channel))} ${unitForChannel(series.channel)}`;
+
+        lines.push({ text, color: series.solid || series.color });
+    });
+
+    for (let channel = 0; channel < 2; channel++) {
+        if (nearest.err[channel] !== 0) {
+            lines.push({ text: `Lỗi CH${channel + 1}: ${decodeError(nearest.err[channel])}`, color: "#f87171", bold: true });
+        }
+    }
+
+    const boxW = 215;
+    const boxH = 12 + lines.length * 18;
+    let boxX = x + 12;
+    if (boxX + boxW > left + plotW) boxX = x - boxW - 12;
+    const boxY = top + 8;
+
+    ctx.fillStyle = "rgba(2, 6, 23, 0.92)";
+    ctx.strokeStyle = "#475569";
+    ctx.fillRect(boxX, boxY, boxW, boxH);
+    ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+
+    lines.forEach((line, index) => {
+        ctx.font = line.bold ? "bold 12px Consolas, monospace" : "12px Consolas, monospace";
+        ctx.fillStyle = line.color;
+        ctx.fillText(line.text, boxX + 10, boxY + 7 + index * 18);
+    });
 }
 
 
@@ -1856,13 +2274,10 @@ function drawChart() {
    XUẤT EXCEL
 ======================================================== */
 
-const EXCEL_MIME =
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+const EXCEL_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-/* Các format lưu vào Excel dạng số thật (tính toán được) */
 const NUMERIC_FORMATS = new Set([
-    "input", "amp10", "percent10", "decimal10",
-    "ramp100", "ratio1000", "seconds", "integer"
+    "input", "amp10", "percent10", "decimal10", "ramp100", "ratio1000", "seconds", "integer"
 ]);
 
 const THIN_BORDER = { style: "thin", color: { argb: "FF94A3B8" } };
@@ -1883,13 +2298,9 @@ function numFmtForDecimals(n) {
     return n === 0 ? "0" : "0." + "0".repeat(n);
 }
 
-/* Trả về giá trị để ghi vào ô Excel cho 1 tham số / 1 kênh */
 function exportValue(parameter, channel) {
     const raws = parameterData[parameter.key];
-
-    if (!raws) {
-        return { value: "Chưa đọc", numFmt: null };
-    }
+    if (!raws) return { value: "Chưa đọc", numFmt: null };
 
     const raw = raws[channel];
 
@@ -1903,197 +2314,374 @@ function exportValue(parameter, channel) {
     return { value: formatValue(raw, parameter.format, channel), numFmt: null };
 }
 
+/* Excel lưu ngày giờ theo UTC – bù múi giờ để hiển thị đúng giờ máy */
+function excelDate(d) {
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+}
+
+function setDateCell(cell, d, kind) {
+    if (!d) { cell.value = "–"; return; }
+    cell.value = excelDate(d);
+    cell.numFmt = kind === "date" ? "dd/mm/yyyy" : "hh:mm:ss";
+}
+
+function colLetter(n) {
+    let s = "";
+    while (n > 0) {
+        const m = (n - 1) % 26;
+        s = String.fromCharCode(65 + m) + s;
+        n = Math.floor((n - 1) / 26);
+    }
+    return s;
+}
+
 function styleCell(cell, options = {}) {
     cell.alignment = {
         vertical: "middle",
         horizontal: options.left ? "left" : "center",
         wrapText: true
     };
-
-    cell.border = {
-        top: THIN_BORDER,
-        left: THIN_BORDER,
-        bottom: THIN_BORDER,
-        right: THIN_BORDER
-    };
-
-    if (options.fill) {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: options.fill } };
-    }
-
+    cell.border = { top: THIN_BORDER, left: THIN_BORDER, bottom: THIN_BORDER, right: THIN_BORDER };
+    if (options.fill) cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: options.fill } };
     if (options.font) cell.font = options.font;
     if (options.numFmt) cell.numFmt = options.numFmt;
 }
 
-function styleHeaderRow(row) {
-    row.height = 30;
-    row.eachCell(cell => {
+/* Tạo sheet dạng báo cáo: tiêu đề + dòng thông tin + hàng tiêu đề cột */
+function createReportSheet(workbook, name, title, columns, infoLines) {
+    const ws = workbook.addWorksheet(name);
+    const last = colLetter(columns.length);
+
+    columns.forEach((column, index) => {
+        ws.getColumn(index + 1).width = column.width;
+    });
+
+    ws.mergeCells(`A1:${last}1`);
+    const titleCell = ws.getCell("A1");
+    titleCell.value = title;
+    titleCell.font = { bold: true, size: 15, color: { argb: "FFFFFFFF" } };
+    titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF0F172A" } };
+    titleCell.alignment = { vertical: "middle", horizontal: "center" };
+    ws.getRow(1).height = 30;
+
+    infoLines.forEach((line, index) => {
+        const r = index + 2;
+        ws.mergeCells(`A${r}:${last}${r}`);
+        const cell = ws.getCell(`A${r}`);
+        cell.value = line;
+        cell.font = { bold: true, color: { argb: "FF1E293B" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE2E8F0" } };
+        cell.alignment = { vertical: "middle", horizontal: "left" };
+        ws.getRow(r).height = 20;
+    });
+
+    const headerIndex = infoLines.length + 2;
+    const headerRow = ws.getRow(headerIndex);
+    headerRow.height = 32;
+
+    columns.forEach((column, index) => {
+        const cell = headerRow.getCell(index + 1);
+        cell.value = column.header;
         styleCell(cell, {
-            fill: "FF334155",
+            fill: column.fill || "FF334155",
             font: { bold: true, color: { argb: "FFFFFFFF" } }
         });
     });
+
+    ws.views = [{ state: "frozen", ySplit: headerIndex }];
+
+    return {
+        ws,
+        finish() {
+            if (ws.rowCount > headerIndex) {
+                ws.autoFilter = { from: `A${headerIndex}`, to: `${last}${headerIndex}` };
+            }
+        }
+    };
 }
 
+function deviceInfoLine() {
+    return `Thiết bị: CONCH MTB-22-00   |   Slave ID: ${getSlaveId()}   |   Baud rate: ${$("baudRate").value}, 8N1`;
+}
+
+const TIME_FILL = "FF1E3A8A";
+
 /* ---------- Sheet 1: Thông số ---------- */
-function buildParameterSheet(workbook) {
-    const ws = workbook.addWorksheet("Thông số", {
-        views: [{ state: "frozen", ySplit: 1 }]
-    });
-
-    ws.columns = [
-        { header: "STT",          width: 6  },
-        { header: "Mã",           width: 10 },
-        { header: "English",      width: 30 },
-        { header: "Tiếng Việt",   width: 36 },
-        { header: "Đơn vị",       width: 12 },
-        { header: "Địa chỉ CH1",  width: 13 },
-        { header: "Địa chỉ CH2",  width: 13 },
-        { header: "Giá trị CH1",  width: 22 },
-        { header: "Giá trị CH2",  width: 22 },
-        { header: "Mặc định NSX", width: 22 }
-    ];
-
-    styleHeaderRow(ws.getRow(1));
+function buildParameterSheet(workbook, now) {
+    const { ws, finish } = createReportSheet(workbook, "Thông số",
+        "BẢNG THÔNG SỐ CONCH MTB-22-00",
+        [
+            { header: "STT", width: 6 },
+            { header: "Mã", width: 10 },
+            { header: "English", width: 30 },
+            { header: "Tiếng Việt", width: 34 },
+            { header: "Đơn vị", width: 11 },
+            { header: "Địa chỉ CH1", width: 12 },
+            { header: "Địa chỉ CH2", width: 12 },
+            { header: "Giá trị CH1", width: 20 },
+            { header: "Giá trị CH2", width: 20 },
+            { header: "Mặc định NSX", width: 20 },
+            { header: "Ngày truy xuất", width: 14, fill: TIME_FILL },
+            { header: "Giờ truy xuất", width: 13, fill: TIME_FILL }
+        ],
+        [
+            deviceInfoLine(),
+            `Thời gian truy xuất: ${lastReadStart ? formatDateTime(lastReadStart) + " → " + formatDateTime(lastReadTime) : "Chưa đọc"}` +
+            `   |   Thời gian xuất file: ${formatDateTime(now)}`,
+            `CH1: InTy ${INPUT_TYPES[inputType[0]] ?? inputType[0]}, Unit ${unitForChannel(0)}, Raw ÷ ${scaleForChannel(0)}` +
+            `   |   CH2: InTy ${INPUT_TYPES[inputType[1]] ?? inputType[1]}, Unit ${unitForChannel(1)}, Raw ÷ ${scaleForChannel(1)}`
+        ]
+    );
 
     PARAMETERS.forEach((parameter, index) => {
         const v1 = exportValue(parameter, 0);
         const v2 = exportValue(parameter, 1);
+        const time = parameterReadTime[parameter.key];
 
         const row = ws.addRow([
-            index + 1,
-            parameter.code,
-            parameter.en,
-            parameter.vi,
-            parameter.unit,
-            parameter.address,
-            parameter.address + 1,
-            v1.value,
-            v2.value,
-            parameter.defaultValue
+            index + 1, parameter.code, parameter.en, parameter.vi, parameter.unit,
+            parameter.address, parameter.address + 1,
+            v1.value, v2.value, parameter.defaultValue, null, null
         ]);
 
+        setDateCell(row.getCell(11), time, "date");
+        setDateCell(row.getCell(12), time, "time");
         row.height = 22;
+
         const zebra = index % 2 === 1 ? "FFF1F5F9" : null;
 
-        row.eachCell({ includeEmpty: true }, (cell, col) => {
+        for (let col = 1; col <= 12; col++) {
             const options = { fill: zebra };
-
             if (col === 2) options.font = { bold: true, color: { argb: "FF0369A1" } };
             if (col === 3 || col === 4) options.left = true;
             if (col === 6 || col === 7) options.font = { color: { argb: "FF6D28D9" } };
             if (col === 8) { options.numFmt = v1.numFmt; options.font = { color: { argb: "FF166534" } }; }
             if (col === 9) { options.numFmt = v2.numFmt; options.font = { color: { argb: "FF166534" } }; }
-            if (col === 10) {
-                options.fill = "FFFEF3C7";
-                options.font = { bold: true, color: { argb: "FF92400E" } };
+            if (col === 10) { options.fill = "FFFEF3C7"; options.font = { bold: true, color: { argb: "FF92400E" } }; }
+            if (col >= 11) options.font = { color: { argb: "FF1D4ED8" } };
+            styleCell(row.getCell(col), options);
+        }
+    });
+
+    finish();
+}
+
+/* ---------- Sheet 2: Lịch sử truy xuất ---------- */
+function buildHistorySheet(workbook, now) {
+    const { ws, finish } = createReportSheet(workbook, "Lịch sử truy xuất",
+        "LỊCH SỬ TRUY XUẤT THÔNG SỐ",
+        [
+            { header: "Lần", width: 7 },
+            { header: "Ngày truy xuất", width: 14, fill: TIME_FILL },
+            { header: "Giờ truy xuất", width: 13, fill: TIME_FILL },
+            { header: "Mã", width: 10 },
+            { header: "English", width: 30 },
+            { header: "Tiếng Việt", width: 34 },
+            { header: "Đơn vị", width: 11 },
+            { header: "Địa chỉ CH1", width: 12 },
+            { header: "Địa chỉ CH2", width: 12 },
+            { header: "Giá trị CH1", width: 20 },
+            { header: "Giá trị CH2", width: 20 },
+            { header: "Mặc định NSX", width: 20 }
+        ],
+        [
+            deviceInfoLine(),
+            `Số lần truy xuất: ${readHistory.length}   |   Thời gian xuất file: ${formatDateTime(now)}`
+        ]
+    );
+
+    readHistory.forEach((snap, snapIndex) => {
+        const groupFill = snapIndex % 2 === 1 ? "FFF1F5F9" : null;
+
+        snap.rows.forEach(item => {
+            const p = item.parameter;
+            const row = ws.addRow([
+                snap.index, null, null, p.code, p.en, p.vi, p.unit,
+                p.address, p.address + 1, item.v1.value, item.v2.value, p.defaultValue
+            ]);
+
+            setDateCell(row.getCell(2), item.time || snap.start, "date");
+            setDateCell(row.getCell(3), item.time || snap.start, "time");
+
+            for (let col = 1; col <= 12; col++) {
+                const options = { fill: groupFill };
+                if (col === 2 || col === 3) options.font = { color: { argb: "FF1D4ED8" } };
+                if (col === 4) options.font = { bold: true, color: { argb: "FF0369A1" } };
+                if (col === 5 || col === 6) options.left = true;
+                if (col === 10) options.numFmt = item.v1.numFmt;
+                if (col === 11) options.numFmt = item.v2.numFmt;
+                if (col === 12) { options.fill = "FFFEF3C7"; options.font = { bold: true, color: { argb: "FF92400E" } }; }
+                styleCell(row.getCell(col), options);
             }
-
-            styleCell(cell, options);
         });
     });
 
-    ws.autoFilter = { from: "A1", to: "J1" };
+    if (!readHistory.length) {
+        const row = ws.addRow(["", "Chưa có lần truy xuất nào"]);
+        styleCell(row.getCell(2));
+    }
+
+    finish();
 }
 
-/* ---------- Sheet 2: Thông tin ---------- */
-function buildInfoSheet(workbook, exportTime) {
-    const ws = workbook.addWorksheet("Thông tin");
+/* ---------- Sheet 3: Cảnh báo ---------- */
+function buildAlarmSheet(workbook, now) {
+    const { ws, finish } = createReportSheet(workbook, "Cảnh báo",
+        "NHẬT KÝ CẢNH BÁO & LỖI",
+        [
+            { header: "STT", width: 7 },
+            { header: "Ngày xuất hiện", width: 14, fill: TIME_FILL },
+            { header: "Giờ xuất hiện", width: 13, fill: TIME_FILL },
+            { header: "Ngày kết thúc", width: 14, fill: TIME_FILL },
+            { header: "Giờ kết thúc", width: 13, fill: TIME_FILL },
+            { header: "Thời lượng", width: 12 },
+            { header: "Kênh", width: 10 },
+            { header: "Mã lỗi", width: 10 },
+            { header: "Mô tả", width: 42 },
+            { header: "Mức độ", width: 11 },
+            { header: "Trạng thái", width: 32 },
+            { header: "Ngày xác nhận", width: 14, fill: TIME_FILL },
+            { header: "Giờ xác nhận", width: 13, fill: TIME_FILL }
+        ],
+        [
+            deviceInfoLine(),
+            `Tổng số cảnh báo: ${alarmHistory.length}   |   Đang hoạt động: ${activeAlarms.size}` +
+            `   |   Thời gian xuất file: ${formatDateTime(now)}`
+        ]
+    );
 
-    ws.columns = [
-        { header: "Mục",     width: 30 },
-        { header: "Giá trị", width: 36 }
-    ];
+    alarmHistory.forEach(alarm => {
+        const row = ws.addRow([
+            alarm.id, null, null, null, null,
+            ((alarm.end || now) - alarm.start) / 86400000,
+            alarm.channel, alarm.code, alarm.message, alarm.severity,
+            alarmStatusText(alarm), null, null
+        ]);
 
-    styleHeaderRow(ws.getRow(1));
+        setDateCell(row.getCell(2), alarm.start, "date");
+        setDateCell(row.getCell(3), alarm.start, "time");
+        setDateCell(row.getCell(4), alarm.end, "date");
+        setDateCell(row.getCell(5), alarm.end, "time");
+        setDateCell(row.getCell(12), alarm.ack, "date");
+        setDateCell(row.getCell(13), alarm.ack, "time");
 
-    const firstLog = realtimeLog[0];
-    const lastLog = realtimeLog[realtimeLog.length - 1];
+        const fill = !alarm.end ? "FFFEE2E2" : null;
 
-    const rows = [
-        ["Thiết bị", "CONCH MTB-22-00"],
-        ["Slave ID", getSlaveId()],
-        ["Baud rate", `${document.getElementById("baudRate").value}, 8N1`],
-        ["Thời điểm đọc thông số", formatDateTime(lastReadTime)],
-        ["Thời điểm xuất file", formatDateTime(exportTime)],
-        ["Realtime – bắt đầu", firstLog ? formatDateTime(firstLog.time) : "Không có"],
-        ["Realtime – kết thúc", lastLog ? formatDateTime(lastLog.time) : "Không có"],
-        ["Realtime – số dòng", realtimeLog.length],
-        ["InTy CH1", `${inputType[0]} – ${INPUT_TYPES[inputType[0]] ?? "Không rõ"}`],
-        ["InTy CH2", `${inputType[1]} – ${INPUT_TYPES[inputType[1]] ?? "Không rõ"}`],
-        ["Unit CH1", unitForChannel(0)],
-        ["Unit CH2", unitForChannel(1)],
-        ["Hệ số scale CH1", `Raw ÷ ${scaleForChannel(0)}`],
-        ["Hệ số scale CH2", `Raw ÷ ${scaleForChannel(1)}`]
-    ];
-
-    rows.forEach(values => {
-        const row = ws.addRow(values);
-        row.height = 22;
-        row.eachCell((cell, col) => {
-            styleCell(cell, col === 1
-                ? { left: true, font: { bold: true } }
-                : {});
-        });
+        for (let col = 1; col <= 13; col++) {
+            const options = { fill };
+            if (col === 6) options.numFmt = "[h]:mm:ss";
+            if (col === 9) options.left = true;
+            if (col === 10) {
+                options.font = { bold: true, color: { argb: alarm.severity === "Lỗi" ? "FFB91C1C" : "FFB45309" } };
+            }
+            styleCell(row.getCell(col), options);
+        }
     });
+
+    if (!alarmHistory.length) {
+        const row = ws.addRow(["", "Không có cảnh báo"]);
+        styleCell(row.getCell(2));
+    }
+
+    finish();
 }
 
-/* ---------- Sheet 3: Realtime (Ngày, Giờ tách riêng) ---------- */
-function buildRealtimeSheet(workbook) {
-    const ws = workbook.addWorksheet("Realtime", {
-        views: [{ state: "frozen", ySplit: 1 }]
-    });
+/* ---------- Sheet 4: Realtime ---------- */
+function buildRealtimeSheet(workbook, now) {
+    const first = realtimeLog[0];
+    const last = realtimeLog[realtimeLog.length - 1];
 
-    ws.columns = [
-        { header: "STT",                           width: 8  },
-        { header: "Ngày",                          width: 13 },
-        { header: "Giờ",                           width: 11 },
-        { header: `PV CH1 (${unitForChannel(0)})`, width: 13 },
-        { header: `SV CH1 (${unitForChannel(0)})`, width: 13 },
-        { header: "OUT CH1 (%)",                   width: 13 },
-        { header: "Lỗi CH1",                       width: 16 },
-        { header: `PV CH2 (${unitForChannel(1)})`, width: 13 },
-        { header: `SV CH2 (${unitForChannel(1)})`, width: 13 },
-        { header: "OUT CH2 (%)",                   width: 13 },
-        { header: "Lỗi CH2",                       width: 16 }
-    ];
-
-    styleHeaderRow(ws.getRow(1));
+    const { ws, finish } = createReportSheet(workbook, "Realtime",
+        "NHẬT KÝ DỮ LIỆU THỜI GIAN THỰC",
+        [
+            { header: "STT", width: 8 },
+            { header: "Ngày", width: 13, fill: TIME_FILL },
+            { header: "Giờ", width: 11, fill: TIME_FILL },
+            { header: `PV CH1 (${unitForChannel(0)})`, width: 13, fill: "FF14532D" },
+            { header: `SV CH1 (${unitForChannel(0)})`, width: 13, fill: "FF14532D" },
+            { header: "OUT CH1 (%)", width: 13, fill: "FF14532D" },
+            { header: "Lỗi CH1", width: 16, fill: "FF14532D" },
+            { header: `PV CH2 (${unitForChannel(1)})`, width: 13, fill: "FF78350F" },
+            { header: `SV CH2 (${unitForChannel(1)})`, width: 13, fill: "FF78350F" },
+            { header: "OUT CH2 (%)", width: 13, fill: "FF78350F" },
+            { header: "Lỗi CH2", width: 16, fill: "FF78350F" }
+        ],
+        [
+            deviceInfoLine(),
+            `Từ ${first ? formatDateTime(first.time) : "–"} đến ${last ? formatDateTime(last.time) : "–"}` +
+            `   |   ${realtimeLog.length} dòng   |   Thời gian xuất file: ${formatDateTime(now)}`
+        ]
+    );
 
     const fmt1 = numFmtForDecimals(decimalCountForChannel(0));
     const fmt2 = numFmtForDecimals(decimalCountForChannel(1));
 
     realtimeLog.forEach((entry, index) => {
         const row = ws.addRow([
-            index + 1,
-            formatDate(entry.time),
-            formatTime(entry.time),
-            entry.pv[0] === null ? "OPEN" : entry.pv[0],
-            entry.sv[0],
-            entry.out[0],
-            decodeError(entry.err[0]),
-            entry.pv[1] === null ? "OPEN" : entry.pv[1],
-            entry.sv[1],
-            entry.out[1],
-            decodeError(entry.err[1])
+            index + 1, null, null,
+            entry.pv[0] === null ? "OPEN" : entry.pv[0], entry.sv[0], entry.out[0], decodeError(entry.err[0]),
+            entry.pv[1] === null ? "OPEN" : entry.pv[1], entry.sv[1], entry.out[1], decodeError(entry.err[1])
         ]);
 
-        row.eachCell({ includeEmpty: true }, (cell, col) => {
+        setDateCell(row.getCell(2), entry.time, "date");
+        setDateCell(row.getCell(3), entry.time, "time");
+
+        for (let col = 1; col <= 11; col++) {
+            const cell = row.getCell(col);
             const options = {};
             if (col === 4 || col === 5) options.numFmt = fmt1;
             if (col === 8 || col === 9) options.numFmt = fmt2;
             if (col === 6 || col === 10) options.numFmt = "0.0";
-            if (cell.value === "OPEN") options.font = { bold: true, color: { argb: "FFB91C1C" } };
+            if (cell.value === "OPEN" ||
+                (col === 7 && entry.err[0] !== 0) ||
+                (col === 11 && entry.err[1] !== 0)) {
+                options.font = { bold: true, color: { argb: "FFB91C1C" } };
+            }
             styleCell(cell, options);
-        });
+        }
     });
 
-    if (realtimeLog.length === 0) {
+    if (!realtimeLog.length) {
         const row = ws.addRow(["", "Chưa có dữ liệu realtime"]);
         styleCell(row.getCell(2));
-    } else {
-        ws.autoFilter = { from: "A1", to: "K1" };
     }
+
+    finish();
+}
+
+/* ---------- Sheet 5: Thông tin ---------- */
+function buildInfoSheet(workbook, now) {
+    const { ws } = createReportSheet(workbook, "Thông tin",
+        "THÔNG TIN BÁO CÁO",
+        [{ header: "Mục", width: 32 }, { header: "Giá trị", width: 40 }],
+        []
+    );
+
+    const rows = [
+        ["Thiết bị", "CONCH MTB-22-00"],
+        ["Slave ID", getSlaveId()],
+        ["Baud rate", `${$("baudRate").value}, 8N1`],
+        ["Truy xuất gần nhất – bắt đầu", formatDateTime(lastReadStart)],
+        ["Truy xuất gần nhất – kết thúc", formatDateTime(lastReadTime)],
+        ["Số lần truy xuất", readCounter],
+        ["Thời gian xuất file", formatDateTime(now)],
+        ["InTy CH1", `${inputType[0]} – ${INPUT_TYPES[inputType[0]] ?? "Không rõ"}`],
+        ["InTy CH2", `${inputType[1]} – ${INPUT_TYPES[inputType[1]] ?? "Không rõ"}`],
+        ["Unit CH1", unitForChannel(0)],
+        ["Unit CH2", unitForChannel(1)],
+        ["Hệ số scale CH1", `Raw ÷ ${scaleForChannel(0)}`],
+        ["Hệ số scale CH2", `Raw ÷ ${scaleForChannel(1)}`],
+        ["Tổng số cảnh báo", alarmHistory.length],
+        ["Cảnh báo đang hoạt động", activeAlarms.size],
+        ["Số dòng realtime", realtimeLog.length]
+    ];
+
+    rows.forEach(values => {
+        const row = ws.addRow(values);
+        row.height = 22;
+        styleCell(row.getCell(1), { left: true, font: { bold: true } });
+        styleCell(row.getCell(2));
+    });
 }
 
 function downloadBlob(blob, filename) {
@@ -2116,22 +2704,19 @@ function csvEscape(value) {
 function exportCsv(baseName) {
     const lines = [[
         "STT", "Mã", "English", "Tiếng Việt", "Đơn vị",
-        "Địa chỉ CH1", "Địa chỉ CH2",
-        "Giá trị CH1", "Giá trị CH2", "Mặc định NSX"
+        "Địa chỉ CH1", "Địa chỉ CH2", "Giá trị CH1", "Giá trị CH2",
+        "Mặc định NSX", "Ngày truy xuất", "Giờ truy xuất"
     ]];
 
     PARAMETERS.forEach((parameter, index) => {
+        const time = parameterReadTime[parameter.key];
         lines.push([
-            index + 1,
-            parameter.code,
-            parameter.en,
-            parameter.vi,
-            parameter.unit,
-            parameter.address,
-            parameter.address + 1,
-            exportValue(parameter, 0).value,
-            exportValue(parameter, 1).value,
-            parameter.defaultValue
+            index + 1, parameter.code, parameter.en, parameter.vi, parameter.unit,
+            parameter.address, parameter.address + 1,
+            exportValue(parameter, 0).value, exportValue(parameter, 1).value,
+            parameter.defaultValue,
+            time ? formatDate(time) : "–",
+            time ? formatTime(time) : "–"
         ]);
     });
 
@@ -2140,10 +2725,8 @@ function exportCsv(baseName) {
 }
 
 async function exportExcel() {
-    const hasData = Object.keys(parameterData).length > 0;
-
-    if (!hasData && !confirm(
-        "Chưa đọc thông số từ MTB.\n" +
+    if (!Object.keys(parameterData).length && !confirm(
+        "Chưa truy xuất thông số từ MTB.\n" +
         "Vẫn xuất bảng chỉ có địa chỉ và giá trị mặc định NSX?"
     )) {
         return;
@@ -2158,10 +2741,7 @@ async function exportExcel() {
         if (typeof ExcelJS === "undefined") {
             exportCsv(baseName);
             addLog(`Không tải được thư viện Excel – đã xuất CSV: ${baseName}.csv`);
-            alert(
-                "Không tải được thư viện Excel (có thể do mất mạng).\n" +
-                "Đã xuất file CSV thay thế, mở được bằng Excel."
-            );
+            alert("Không tải được thư viện Excel (có thể do mất mạng).\nĐã xuất file CSV thay thế, mở được bằng Excel.");
             return;
         }
 
@@ -2169,18 +2749,17 @@ async function exportExcel() {
         workbook.creator = "CONCH MTB Web";
         workbook.created = now;
 
-        buildParameterSheet(workbook);
+        buildParameterSheet(workbook, now);
+        if ($("includeHistory").checked) buildHistorySheet(workbook, now);
+        if ($("includeAlarms").checked) buildAlarmSheet(workbook, now);
+        if ($("includeRealtime").checked) buildRealtimeSheet(workbook, now);
         buildInfoSheet(workbook, now);
-
-        if (document.getElementById("includeRealtime").checked) {
-            buildRealtimeSheet(workbook);
-        }
 
         const buffer = await workbook.xlsx.writeBuffer();
         downloadBlob(new Blob([buffer], { type: EXCEL_MIME }), baseName + ".xlsx");
 
         addLog(`Đã xuất Excel: ${baseName}.xlsx`);
-        setStatus("Đã xuất file Excel", "online");
+        setStatus(`Đã xuất Excel lúc ${formatDateTime(now)}`, "online");
 
     } catch (error) {
         addLog(`Lỗi xuất Excel: ${error.message}`);
@@ -2197,12 +2776,10 @@ async function readAndExport() {
         return;
     }
 
-    const ok = await readAllParameters();
-
-    if (ok) {
+    if (await readAllParameters()) {
         await exportExcel();
     } else {
-        alert("Đọc thông số thất bại, chưa xuất file. Xem Nhật ký Modbus để biết lỗi.");
+        alert("Truy xuất thông số thất bại, chưa xuất file. Xem Nhật ký Modbus để biết lỗi.");
     }
 }
 
@@ -2211,7 +2788,7 @@ function clearRealtimeLog() {
     if (!confirm(`Xóa ${realtimeLog.length} dòng nhật ký realtime (biểu đồ và bảng)?`)) return;
 
     realtimeLog.length = 0;
-    updateRealtimeCount();
+    $("realtimeCount").textContent = 0;
     drawChart();
     renderRealtimeTable();
     addLog("Đã xóa nhật ký realtime");
@@ -2240,7 +2817,10 @@ async function connectSerial() {
         throw new Error("Edge hoặc chính sách IT không cho phép Web Serial");
     }
 
-    const baudRate = Number(document.getElementById("baudRate").value);
+    /* Khởi tạo âm thanh trong lúc người dùng bấm nút (trình duyệt yêu cầu) */
+    try { audioContext = audioContext || new AudioContext(); } catch (_) {}
+
+    const baudRate = Number($("baudRate").value);
 
     port = await navigator.serial.requestPort();
 
@@ -2254,6 +2834,7 @@ async function connectSerial() {
     });
 
     connected = true;
+    commFailCount = 0;
     connectButton.textContent = "Ngắt kết nối";
     connectButton.className = "disconnect";
     updateButtons();
@@ -2263,7 +2844,6 @@ async function connectSerial() {
 
     serialReadLoop();
 
-    /* Đọc InTy, Unit, Pnt trước để xác định đúng scale riêng cho từng kênh */
     operationBusy = true;
     try {
         await readInputConfiguration();
@@ -2295,6 +2875,9 @@ async function disconnectSerial() {
 
     port = null;
     receiveBuffer = [];
+
+    /* Đóng các cảnh báo đang hoạt động */
+    [...activeAlarms.keys()].forEach(key => clearAlarm(key, "ngắt kết nối"));
 
     connectButton.textContent = "Kết nối USB–RS485";
     connectButton.className = "";
@@ -2329,15 +2912,28 @@ connectButton.addEventListener("click", async () => {
 readParameterButton.addEventListener("click", readAllParameters);
 readExportButton.addEventListener("click", readAndExport);
 exportButton.addEventListener("click", exportExcel);
-clearLogButton.addEventListener("click", clearRealtimeLog);
+$("clearLogButton").addEventListener("click", clearRealtimeLog);
 enableWrite.addEventListener("change", updateButtons);
 
-document.getElementById("timeWindow").addEventListener("change", drawChart);
-document.getElementById("tableRows").addEventListener("change", renderRealtimeTable);
+$("timeWindow").addEventListener("change", drawChart);
+$("showAlarmZones").addEventListener("change", drawChart);
+$("tableRows").addEventListener("change", renderRealtimeTable);
+
+$("alarmFilter").addEventListener("change", renderAlarms);
+$("ackAllButton").addEventListener("click", acknowledgeAll);
+$("clearAlarmButton").addEventListener("click", clearEndedAlarms);
+
+$("alarmTableBody").addEventListener("click", event => {
+    const button = event.target.closest("[data-ack]");
+    if (button) acknowledgeAlarm(Number(button.dataset.ack));
+});
+
+$("alarmBanner").addEventListener("click", () => {
+    $("alarmSection").scrollIntoView({ behavior: "smooth" });
+});
 
 chartCanvas.addEventListener("mousemove", event => {
-    const rect = chartCanvas.getBoundingClientRect();
-    hoverX = event.clientX - rect.left;
+    hoverX = event.clientX - chartCanvas.getBoundingClientRect().left;
     drawChart();
 });
 
@@ -2350,7 +2946,7 @@ window.addEventListener("resize", drawChart);
 
 
 /* ========================================================
-   KHỞI TẠO GIAO DIỆN
+   KHỞI TẠO
 ======================================================== */
 
 createParameterTable();
@@ -2358,7 +2954,11 @@ createWriteSections();
 createChartLegend();
 drawChart();
 renderRealtimeTable();
+renderAlarms();
+renderReadHistory();
 updateButtons();
+tickClock();
+setInterval(tickClock, 1000);
 
 document.querySelectorAll(".group-read").forEach(button => {
     button.addEventListener("click", () => readWriteGroup(button.dataset.group));
