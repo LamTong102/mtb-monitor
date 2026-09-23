@@ -2,8 +2,11 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
 
     <title>CONCH MTB-22-00 Monitor</title>
 
@@ -21,12 +24,16 @@
         }
 
         .container {
-            max-width: 1050px;
+            max-width: 1180px;
             margin: auto;
         }
 
         h1 {
             margin-bottom: 5px;
+        }
+
+        h2 {
+            margin-top: 0;
         }
 
         .description {
@@ -37,12 +44,14 @@
         .toolbar,
         .card,
         .chart-card,
+        .parameter-card,
         .log-card {
             margin-bottom: 18px;
             padding: 18px;
             border: 1px solid #334155;
             border-radius: 14px;
             background: #1e293b;
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.2);
         }
 
         .toolbar {
@@ -82,6 +91,14 @@
             background: #0369a1;
         }
 
+        button.secondary {
+            background: #7c3aed;
+        }
+
+        button.secondary:hover {
+            background: #6d28d9;
+        }
+
         button.disconnect {
             background: #b91c1c;
         }
@@ -112,11 +129,14 @@
             gap: 18px;
         }
 
+        /*
+         * Nhiệt độ hiển thị màu xanh lá cây.
+         */
         .temperature {
             margin: 12px 0 20px;
-            font-size: 46px;
+            font-size: 48px;
             font-weight: bold;
-            color: #38bdf8;
+            color: #22c55e;
         }
 
         .open-value {
@@ -143,16 +163,68 @@
             color: #f87171;
         }
 
+        .note {
+            color: #fbbf24;
+        }
+
         canvas {
             display: block;
             width: 100%;
-            height: 300px;
+            height: 320px;
             border-radius: 8px;
             background: #0b1220;
         }
 
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 760px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 11px 12px;
+            border: 1px solid #475569;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            color: #f8fafc;
+            background: #334155;
+        }
+
+        tbody tr:nth-child(even) {
+            background: rgba(51, 65, 85, 0.35);
+        }
+
+        tbody tr:hover {
+            background: rgba(14, 165, 233, 0.12);
+        }
+
+        .parameter-name {
+            font-weight: bold;
+            color: #7dd3fc;
+        }
+
+        .parameter-value {
+            font-family: Consolas, monospace;
+            color: #86efac;
+        }
+
+        .parameter-default {
+            font-family: Consolas, monospace;
+            color: #fcd34d;
+        }
+
         #log {
-            height: 180px;
+            height: 190px;
             margin: 0;
             padding: 12px;
             overflow-y: auto;
@@ -164,13 +236,17 @@
             font-size: 13px;
         }
 
-        .note {
-            color: #fbbf24;
-        }
-
         @media (max-width: 700px) {
             .grid {
                 grid-template-columns: 1fr;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            .temperature {
+                font-size: 40px;
             }
         }
     </style>
@@ -182,17 +258,21 @@
     <h1>CONCH MTB-22-00</h1>
 
     <p class="description">
-        Đọc Modbus RTU trực tiếp bằng Web Serial
+        Giám sát Modbus RTU trực tiếp bằng Microsoft Edge
     </p>
 
-    <div class="toolbar">
+    <!-- Thanh kết nối -->
+    <section class="toolbar">
+
         <label>
             Slave ID
-            <input id="slaveId"
-                   type="number"
-                   min="1"
-                   max="247"
-                   value="1">
+            <input
+                id="slaveId"
+                type="number"
+                min="1"
+                max="247"
+                value="1"
+            >
         </label>
 
         <label>
@@ -207,7 +287,7 @@
         </label>
 
         <label>
-            Định dạng nhiệt độ
+            Kiểu nhiệt độ
             <select id="temperatureScale">
                 <option value="10" selected>
                     1 số lẻ — K1/K2
@@ -233,25 +313,36 @@
             Kết nối USB–RS485
         </button>
 
+        <button
+            id="readParametersButton"
+            class="secondary"
+            disabled
+        >
+            Đọc thông số cài đặt
+        </button>
+
         <span id="status" class="status">
             Chưa kết nối
         </span>
-    </div>
+
+    </section>
 
     <p class="note">
-        Với InTy = K1, hãy chọn “1 số lẻ — K1/K2”.
+        MTB đang đặt InTy = K1 thì chọn “1 số lẻ — K1/K2”.
     </p>
 
+    <!-- Hiển thị kênh -->
     <div class="grid">
+
         <section class="card">
-            <h2>CH1</h2>
+            <h2>Kênh 1 — CH1</h2>
 
             <div id="ch1Pv" class="temperature">
                 -- °C
             </div>
 
             <div class="row">
-                <span>SV</span>
+                <span>Nhiệt độ cài đặt SV</span>
                 <strong id="ch1Sv">-- °C</strong>
             </div>
 
@@ -267,14 +358,14 @@
         </section>
 
         <section class="card">
-            <h2>CH2</h2>
+            <h2>Kênh 2 — CH2</h2>
 
             <div id="ch2Pv" class="temperature">
                 -- °C
             </div>
 
             <div class="row">
-                <span>SV</span>
+                <span>Nhiệt độ cài đặt SV</span>
                 <strong id="ch2Sv">-- °C</strong>
             </div>
 
@@ -288,29 +379,78 @@
                 <strong id="ch2Error">--</strong>
             </div>
         </section>
+
     </div>
 
+    <!-- Biểu đồ SV -->
     <section class="chart-card">
-        <h2>Biểu đồ thời gian thực</h2>
-        <canvas id="chart"
-                width="1000"
-                height="300">
-        </canvas>
+        <h2>
+            Biểu đồ nhiệt độ cài đặt SV của CH1 và CH2
+        </h2>
+
+        <canvas
+            id="chart"
+            width="1100"
+            height="320"
+        ></canvas>
+
+        <p class="description">
+            Đường xanh lá: SV kênh 1.
+            Đường cam: SV kênh 2.
+        </p>
     </section>
 
+    <!-- Bảng thông số -->
+    <section class="parameter-card">
+        <h2>Thông số đang cài đặt trong MTB</h2>
+
+        <p class="description">
+            Sau khi kết nối, bấm “Đọc thông số cài đặt”.
+            Giá trị hiện tại được đọc trực tiếp từ MTB.
+        </p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>
+                        Parameter / Chức năng
+                    </th>
+
+                    <th>
+                        Giá trị hiện tại<br>
+                        CH1 / CH2
+                    </th>
+
+                    <th>
+                        Giá trị mặc định
+                    </th>
+                </tr>
+                </thead>
+
+                <tbody id="parameterTableBody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Nhật ký -->
     <section class="log-card">
-        <h2>Nhật ký giao tiếp</h2>
+        <h2>Nhật ký giao tiếp Modbus</h2>
         <pre id="log"></pre>
     </section>
+
 </div>
 
 <script>
 "use strict";
 
 /*
- * Địa chỉ thanh ghi của MTB-22-00
- * Đây là offset 0-based, không phải dạng 4xxxx.
+ * =========================================================
+ * ĐỊA CHỈ THANH GHI CƠ BẢN
+ * =========================================================
  */
+
 const REGISTERS = {
     SV: 0,
     OUTPUT: 518,
@@ -318,18 +458,30 @@ const REGISTERS = {
     ERROR: 596
 };
 
+
+/*
+ * =========================================================
+ * TRẠNG THÁI CHƯƠNG TRÌNH
+ * =========================================================
+ */
+
 let port = null;
 let reader = null;
 let connected = false;
+let loadingParameters = false;
+
 let pendingRequest = null;
 let receiveBuffer = [];
 
 const historyLimit = 120;
-const historyCh1 = [];
-const historyCh2 = [];
+const historySv1 = [];
+const historySv2 = [];
 
 const connectButton =
     document.getElementById("connectButton");
+
+const readParametersButton =
+    document.getElementById("readParametersButton");
 
 const statusElement =
     document.getElementById("status");
@@ -338,8 +490,239 @@ const logElement =
     document.getElementById("log");
 
 
+/*
+ * =========================================================
+ * DANH SÁCH THÔNG SỐ
+ *
+ * address là địa chỉ CH1.
+ * CH2 nằm ngay tại address + 1.
+ * =========================================================
+ */
+
+const PARAMETERS = [
+    {
+        name: "SV — Set Value / Nhiệt độ cài đặt",
+        address: 0,
+        format: "temperature",
+        defaultValue: "0"
+    },
+    {
+        name: "AL1 — Alarm 1 / Cảnh báo 1",
+        address: 4,
+        format: "temperature",
+        defaultValue: "0"
+    },
+    {
+        name: "HBA — Heater Break Alarm / Ngưỡng cảnh báo đứt dây gia nhiệt",
+        address: 6,
+        format: "ampere10",
+        defaultValue: "0 A"
+    },
+    {
+        name: "AL2 — Alarm 2 / Cảnh báo 2",
+        address: 8,
+        format: "temperature",
+        defaultValue: "0"
+    },
+    {
+        name: "AL3 — Alarm 3 / Cảnh báo 3",
+        address: 12,
+        format: "temperature",
+        defaultValue: "0"
+    },
+    {
+        name: "AT — Auto-Tuning / Tự động dò PID",
+        address: 16,
+        format: "yesNo",
+        defaultValue: "No"
+    },
+    {
+        name: "P1 — Proportional Band / Dải tỷ lệ gia nhiệt",
+        address: 20,
+        format: "temperature",
+        defaultValue: "6"
+    },
+    {
+        name: "I1 — Integral Time / Thời gian tích phân",
+        address: 24,
+        format: "seconds",
+        defaultValue: "240 s"
+    },
+    {
+        name: "ARW1 — Anti Reset Windup / Giới hạn tích phân",
+        address: 28,
+        format: "percent10",
+        defaultValue: "100.0 %"
+    },
+    {
+        name: "D1 — Derivative Time / Thời gian vi phân",
+        address: 32,
+        format: "seconds",
+        defaultValue: "60 s"
+    },
+    {
+        name: "CYC1 — Output Cycle / Chu kỳ ngõ ra gia nhiệt",
+        address: 36,
+        format: "seconds",
+        defaultValue: "1 s đối với ngõ ra Vp"
+    },
+    {
+        name: "O1Lo — Output Low Limit / Giới hạn công suất thấp",
+        address: 44,
+        format: "percent10",
+        defaultValue: "0.0 %"
+    },
+    {
+        name: "O1Hi — Output High Limit / Giới hạn công suất cao",
+        address: 48,
+        format: "percent10",
+        defaultValue: "100.0 %"
+    },
+    {
+        name: "HYS — Hysteresis / Độ trễ điều khiển ON-OFF",
+        address: 52,
+        format: "temperature",
+        defaultValue: "2"
+    },
+    {
+        name: "P2 — Cooling Proportional Band / Dải tỷ lệ làm lạnh",
+        address: 56,
+        format: "temperature",
+        defaultValue: "6"
+    },
+    {
+        name: "I2 — Cooling Integral Time / Tích phân làm lạnh",
+        address: 60,
+        format: "seconds",
+        defaultValue: "240 s"
+    },
+    {
+        name: "D2 — Cooling Derivative Time / Vi phân làm lạnh",
+        address: 68,
+        format: "seconds",
+        defaultValue: "60 s"
+    },
+    {
+        name: "CYC2 — Cooling Output Cycle / Chu kỳ ngõ ra làm lạnh",
+        address: 72,
+        format: "seconds",
+        defaultValue: "10 s"
+    },
+    {
+        name: "ALFm — Alarm Output Mode / Kiểu tiếp điểm cảnh báo",
+        address: 156,
+        format: "alarmMode",
+        defaultValue: "0 — N.O"
+    },
+    {
+        name: "FiLr — Input Filter / Bộ lọc tín hiệu đầu vào",
+        address: 164,
+        format: "decimal10",
+        defaultValue: "0.2"
+    },
+    {
+        name: "Pw.On — Power-on Mode / Chế độ khi cấp nguồn",
+        address: 176,
+        format: "powerMode",
+        defaultValue: "1 — PID Auto"
+    },
+    {
+        name: "InTy — Input Type / Loại cảm biến đầu vào",
+        address: 180,
+        format: "inputType",
+        defaultValue: "K3"
+    },
+    {
+        name: "Unit — Temperature Unit / Đơn vị nhiệt độ",
+        address: 184,
+        format: "unit",
+        defaultValue: "°C"
+    },
+    {
+        name: "PvCm — PV Compensation / Bù sai số nhiệt độ",
+        address: 208,
+        format: "temperature",
+        defaultValue: "0"
+    },
+    {
+        name: "PvC0 — Calibration Point / Điểm gốc hiệu chỉnh",
+        address: 212,
+        format: "temperature",
+        defaultValue: "0"
+    },
+    {
+        name: "PvRat — Calibration Ratio / Tỷ lệ hiệu chỉnh",
+        address: 216,
+        format: "ratio1000",
+        defaultValue: "1.000"
+    },
+    {
+        name: "SvL — SV Low Limit / Giới hạn dưới nhiệt độ cài đặt",
+        address: 220,
+        format: "temperature",
+        defaultValue: "-100, tùy loại đầu vào"
+    },
+    {
+        name: "SvH — SV High Limit / Giới hạn trên nhiệt độ cài đặt",
+        address: 224,
+        format: "temperature",
+        defaultValue: "600, tùy loại đầu vào"
+    },
+    {
+        name: "Dir — Control Direction / Chế độ điều khiển",
+        address: 228,
+        format: "direction",
+        defaultValue: "0 — HEAT"
+    }
+];
+
+
+/*
+ * =========================================================
+ * TẠO BẢNG THÔNG SỐ BAN ĐẦU
+ * =========================================================
+ */
+
+function createParameterTable() {
+    const tbody =
+        document.getElementById("parameterTableBody");
+
+    tbody.innerHTML = "";
+
+    PARAMETERS.forEach((parameter, index) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td class="parameter-name">
+                ${parameter.name}
+            </td>
+
+            <td
+                id="parameter-current-${index}"
+                class="parameter-value"
+            >
+                Chưa đọc
+            </td>
+
+            <td class="parameter-default">
+                ${parameter.defaultValue}
+            </td>
+        `;
+
+        tbody.appendChild(row);
+    });
+}
+
+
+/*
+ * =========================================================
+ * HÀM HIỂN THỊ VÀ LOG
+ * =========================================================
+ */
+
 function addLog(message) {
-    const time = new Date().toLocaleTimeString("vi-VN");
+    const time =
+        new Date().toLocaleTimeString("vi-VN");
 
     logElement.textContent +=
         `[${time}] ${message}\n`;
@@ -363,9 +746,21 @@ function sleep(milliseconds) {
 }
 
 
+function getTemperatureDivisor() {
+    return Number(
+        document.getElementById(
+            "temperatureScale"
+        ).value
+    );
+}
+
+
 /*
- * CRC-16 Modbus.
+ * =========================================================
+ * MODBUS CRC
+ * =========================================================
  */
+
 function calculateCrc(bytes) {
     let crc = 0xFFFF;
 
@@ -389,7 +784,6 @@ function addCrc(bytes) {
     const frame = [...bytes];
     const crc = calculateCrc(frame);
 
-    // Modbus RTU gửi CRC byte thấp trước.
     frame.push(crc & 0xFF);
     frame.push((crc >> 8) & 0xFF);
 
@@ -403,13 +797,13 @@ function checkCrc(frame) {
     }
 
     const body = frame.slice(0, -2);
-    const expectedCrc = calculateCrc(body);
+    const calculated = calculateCrc(body);
 
-    const receivedCrc =
+    const received =
         frame[frame.length - 2] |
         (frame[frame.length - 1] << 8);
 
-    return expectedCrc === receivedCrc;
+    return calculated === received;
 }
 
 
@@ -423,7 +817,8 @@ function toSigned16(value) {
 function bytesToHex(bytes) {
     return Array.from(bytes)
         .map(value =>
-            value.toString(16)
+            value
+                .toString(16)
                 .padStart(2, "0")
                 .toUpperCase()
         )
@@ -432,8 +827,11 @@ function bytesToHex(bytes) {
 
 
 /*
- * Nhận dữ liệu từ cổng serial.
+ * =========================================================
+ * NHẬN DỮ LIỆU SERIAL
+ * =========================================================
  */
+
 function handleIncomingBytes(chunk) {
     receiveBuffer.push(...chunk);
 
@@ -442,10 +840,14 @@ function handleIncomingBytes(chunk) {
     }
 
     const slaveId =
-        Number(document.getElementById("slaveId").value);
+        Number(
+            document.getElementById(
+                "slaveId"
+            ).value
+        );
 
     /*
-     * Bỏ các byte rác trước địa chỉ Slave ID.
+     * Bỏ byte rác trước địa chỉ Slave ID.
      */
     while (
         receiveBuffer.length > 0 &&
@@ -529,8 +931,14 @@ async function serialReadLoop() {
 
     } catch (error) {
         if (connected) {
-            addLog(`Lỗi đọc serial: ${error.message}`);
-            setStatus("Lỗi serial", "error");
+            addLog(
+                `Lỗi đọc serial: ${error.message}`
+            );
+
+            setStatus(
+                "Lỗi đọc cổng serial",
+                "error"
+            );
         }
 
     } finally {
@@ -541,15 +949,22 @@ async function serialReadLoop() {
 
 
 /*
- * Gửi một khung Modbus và chờ phản hồi.
+ * =========================================================
+ * GỬI MODBUS
+ * =========================================================
  */
+
 async function sendRequest(frame) {
     if (!connected || !port) {
-        throw new Error("Chưa kết nối cổng serial");
+        throw new Error(
+            "Chưa kết nối USB–RS485"
+        );
     }
 
     if (pendingRequest) {
-        throw new Error("Đang chờ phản hồi trước đó");
+        throw new Error(
+            "Đang chờ phản hồi Modbus trước đó"
+        );
     }
 
     receiveBuffer = [];
@@ -567,13 +982,15 @@ async function sendRequest(frame) {
     const timer = setTimeout(() => {
         if (pendingRequest) {
             pendingRequest.reject(
-                new Error("Timeout: MTB không phản hồi")
+                new Error(
+                    "Timeout: MTB không phản hồi"
+                )
             );
 
             pendingRequest = null;
             receiveBuffer = [];
         }
-    }, 1200);
+    }, 1400);
 
     pendingRequest = {
         resolve: resolveRequest,
@@ -581,7 +998,8 @@ async function sendRequest(frame) {
         timer: timer
     };
 
-    const writer = port.writable.getWriter();
+    const writer =
+        port.writable.getWriter();
 
     try {
         addLog(`TX: ${bytesToHex(frame)}`);
@@ -600,12 +1018,16 @@ async function sendRequest(frame) {
 }
 
 
-/*
- * Đọc Holding Registers — Function 03.
- */
-async function readHoldingRegisters(address, count) {
+async function readHoldingRegisters(
+    address,
+    count
+) {
     const slaveId =
-        Number(document.getElementById("slaveId").value);
+        Number(
+            document.getElementById(
+                "slaveId"
+            ).value
+        );
 
     const request = addCrc([
         slaveId,
@@ -616,28 +1038,165 @@ async function readHoldingRegisters(address, count) {
         count & 0xFF
     ]);
 
-    const response = await sendRequest(request);
+    const response =
+        await sendRequest(request);
 
     const byteCount = response[2];
 
     if (byteCount !== count * 2) {
         throw new Error(
-            `Số byte trả về không đúng: ${byteCount}`
+            `Số byte trả về không đúng tại địa chỉ ${address}`
         );
     }
 
     const registers = [];
 
-    for (let index = 0; index < count; index++) {
-        const highByte = response[3 + index * 2];
-        const lowByte = response[4 + index * 2];
+    for (
+        let index = 0;
+        index < count;
+        index++
+    ) {
+        const high =
+            response[3 + index * 2];
+
+        const low =
+            response[4 + index * 2];
 
         registers.push(
-            (highByte << 8) | lowByte
+            (high << 8) | low
         );
     }
 
     return registers;
+}
+
+
+/*
+ * =========================================================
+ * GIẢI MÃ CÁC GIÁ TRỊ
+ * =========================================================
+ */
+
+const INPUT_TYPES = {
+    0: "K1",
+    1: "K2",
+    2: "K3",
+    3: "K4",
+    4: "K5",
+    5: "K6",
+    6: "J1",
+    7: "J2",
+    8: "J3",
+    9: "J4",
+    10: "J5",
+    11: "B1",
+    12: "R1",
+    13: "S1",
+    14: "E1",
+    15: "N1",
+    16: "T1",
+    17: "T2",
+    18: "W3",
+    19: "W5",
+    20: "PL2",
+    21: "PT1",
+    22: "PT2",
+    23: "PT3",
+    24: "PT4",
+    25: "PT5",
+    26: "PT6",
+    27: "JP1",
+    28: "JP2",
+    29: "JP3",
+    30: "JP4",
+    31: "JP5",
+    32: "JP6",
+    33: "An10",
+    34: "An20",
+    35: "An50"
+};
+
+
+function formatParameterValue(
+    rawValue,
+    format
+) {
+    const signed =
+        toSigned16(rawValue);
+
+    const divisor =
+        getTemperatureDivisor();
+
+    switch (format) {
+        case "temperature":
+            return (
+                signed / divisor
+            ).toFixed(
+                divisor === 10 ? 1 : 0
+            ) + " °C";
+
+        case "ampere10":
+            return (
+                signed / 10
+            ).toFixed(1) + " A";
+
+        case "percent10":
+            return (
+                signed / 10
+            ).toFixed(1) + " %";
+
+        case "decimal10":
+            return (
+                signed / 10
+            ).toFixed(1);
+
+        case "ratio1000":
+            return (
+                signed / 1000
+            ).toFixed(3);
+
+        case "seconds":
+            return `${signed} s`;
+
+        case "yesNo":
+            return rawValue === 1
+                ? "Yes — Đang bật"
+                : "No — Đang tắt";
+
+        case "alarmMode":
+            return rawValue === 1
+                ? "1 — N.C, thường đóng"
+                : "0 — N.O, thường mở";
+
+        case "powerMode":
+            return rawValue === 1
+                ? "1 — PID Auto"
+                : "0 — Manual";
+
+        case "unit":
+            return rawValue === 1
+                ? "°F"
+                : "°C";
+
+        case "inputType":
+            return INPUT_TYPES[rawValue]
+                ?? `Mã ${rawValue}`;
+
+        case "direction": {
+            const directions = {
+                0: "0 — HEAT / Gia nhiệt",
+                1: "1 — COOL / Làm lạnh",
+                2: "2 — H-C / Gia nhiệt và làm lạnh",
+                3: "3 — VALV / Van tỷ lệ"
+            };
+
+            return directions[rawValue]
+                ?? `Mã ${rawValue}`;
+        }
+
+        default:
+            return String(signed);
+    }
 }
 
 
@@ -658,11 +1217,111 @@ function decodeError(code) {
 }
 
 
-function updateErrorElement(elementId, code) {
+/*
+ * =========================================================
+ * ĐỌC BẢNG THÔNG SỐ
+ * =========================================================
+ */
+
+async function readAllParameters() {
+    if (!connected) {
+        alert("Hãy kết nối USB–RS485 trước.");
+        return;
+    }
+
+    loadingParameters = true;
+    readParametersButton.disabled = true;
+
+    setStatus(
+        "Đang đọc bảng thông số...",
+        "online"
+    );
+
+    addLog("Bắt đầu đọc các thông số cài đặt.");
+
+    try {
+        for (
+            let index = 0;
+            index < PARAMETERS.length;
+            index++
+        ) {
+            const parameter =
+                PARAMETERS[index];
+
+            const cell =
+                document.getElementById(
+                    `parameter-current-${index}`
+                );
+
+            cell.textContent = "Đang đọc...";
+
+            try {
+                const values =
+                    await readHoldingRegisters(
+                        parameter.address,
+                        2
+                    );
+
+                const ch1 =
+                    formatParameterValue(
+                        values[0],
+                        parameter.format
+                    );
+
+                const ch2 =
+                    formatParameterValue(
+                        values[1],
+                        parameter.format
+                    );
+
+                cell.textContent =
+                    `CH1: ${ch1} | CH2: ${ch2}`;
+
+            } catch (error) {
+                cell.textContent =
+                    `Không đọc được: ${error.message}`;
+
+                cell.classList.add("fault");
+            }
+
+            /*
+             * Khoảng nghỉ nhỏ để không làm nghẽn bus.
+             */
+            await sleep(80);
+        }
+
+        setStatus(
+            "Đã đọc xong bảng thông số",
+            "online"
+        );
+
+        addLog(
+            "Đã hoàn thành đọc bảng thông số."
+        );
+
+    } finally {
+        loadingParameters = false;
+        readParametersButton.disabled =
+            !connected;
+    }
+}
+
+
+/*
+ * =========================================================
+ * HIỂN THỊ DỮ LIỆU THỜI GIAN THỰC
+ * =========================================================
+ */
+
+function updateErrorElement(
+    elementId,
+    code
+) {
     const element =
         document.getElementById(elementId);
 
-    element.textContent = decodeError(code);
+    element.textContent =
+        decodeError(code);
 
     element.className =
         code === 0 ? "normal" : "fault";
@@ -679,6 +1338,7 @@ function displayTemperature(
 
     if ((errorCode & 4) !== 0) {
         element.textContent = "OPEN";
+
         element.className =
             "temperature open-value";
 
@@ -686,17 +1346,15 @@ function displayTemperature(
     }
 
     const divisor =
-        Number(
-            document.getElementById(
-                "temperatureScale"
-            ).value
-        );
+        getTemperatureDivisor();
 
     const value =
         toSigned16(rawValue) / divisor;
 
     element.textContent =
-        `${value.toFixed(divisor === 10 ? 1 : 0)} °C`;
+        `${value.toFixed(
+            divisor === 10 ? 1 : 0
+        )} °C`;
 
     element.className = "temperature";
 
@@ -704,123 +1362,119 @@ function displayTemperature(
 }
 
 
-async function readAllData() {
-    /*
-     * Đọc SV CH1 và CH2.
-     */
-    const sv = await readHoldingRegisters(
-        REGISTERS.SV,
-        2
-    );
+async function readRealtimeData() {
+    const sv =
+        await readHoldingRegisters(
+            REGISTERS.SV,
+            2
+        );
 
-    /*
-     * Đọc công suất OUT CH1 và CH2.
-     */
-    const output = await readHoldingRegisters(
-        REGISTERS.OUTPUT,
-        2
-    );
+    const output =
+        await readHoldingRegisters(
+            REGISTERS.OUTPUT,
+            2
+        );
 
-    /*
-     * Đọc PV CH1 và CH2.
-     */
-    const pv = await readHoldingRegisters(
-        REGISTERS.PV,
-        2
-    );
+    const pv =
+        await readHoldingRegisters(
+            REGISTERS.PV,
+            2
+        );
 
-    /*
-     * Đọc ErrCode CH1 và CH2.
-     */
-    const error = await readHoldingRegisters(
-        REGISTERS.ERROR,
-        2
-    );
+    const error =
+        await readHoldingRegisters(
+            REGISTERS.ERROR,
+            2
+        );
 
     const divisor =
-        Number(
-            document.getElementById(
-                "temperatureScale"
-            ).value
-        );
+        getTemperatureDivisor();
 
-    document.getElementById("ch1Sv").textContent =
+    const sv1 =
+        toSigned16(sv[0]) / divisor;
+
+    const sv2 =
+        toSigned16(sv[1]) / divisor;
+
+    document.getElementById(
+        "ch1Sv"
+    ).textContent =
+        `${sv1.toFixed(
+            divisor === 10 ? 1 : 0
+        )} °C`;
+
+    document.getElementById(
+        "ch2Sv"
+    ).textContent =
+        `${sv2.toFixed(
+            divisor === 10 ? 1 : 0
+        )} °C`;
+
+    document.getElementById(
+        "ch1Out"
+    ).textContent =
         `${(
-            toSigned16(sv[0]) / divisor
-        ).toFixed(divisor === 10 ? 1 : 0)} °C`;
+            toSigned16(output[0]) / 10
+        ).toFixed(1)} %`;
 
-    document.getElementById("ch2Sv").textContent =
+    document.getElementById(
+        "ch2Out"
+    ).textContent =
         `${(
-            toSigned16(sv[1]) / divisor
-        ).toFixed(divisor === 10 ? 1 : 0)} °C`;
+            toSigned16(output[1]) / 10
+        ).toFixed(1)} %`;
 
-    document.getElementById("ch1Out").textContent =
-        `${(toSigned16(output[0]) / 10).toFixed(1)} %`;
+    updateErrorElement(
+        "ch1Error",
+        error[0]
+    );
 
-    document.getElementById("ch2Out").textContent =
-        `${(toSigned16(output[1]) / 10).toFixed(1)} %`;
+    updateErrorElement(
+        "ch2Error",
+        error[1]
+    );
 
-    updateErrorElement("ch1Error", error[0]);
-    updateErrorElement("ch2Error", error[1]);
+    displayTemperature(
+        "ch1Pv",
+        pv[0],
+        error[0]
+    );
 
-    const ch1Temperature =
-        displayTemperature(
-            "ch1Pv",
-            pv[0],
-            error[0]
-        );
+    displayTemperature(
+        "ch2Pv",
+        pv[1],
+        error[1]
+    );
 
-    const ch2Temperature =
-        displayTemperature(
-            "ch2Pv",
-            pv[1],
-            error[1]
-        );
+    /*
+     * Biểu đồ sử dụng SV1 và SV2 theo yêu cầu.
+     */
+    historySv1.push(sv1);
+    historySv2.push(sv2);
 
-    historyCh1.push(ch1Temperature);
-    historyCh2.push(ch2Temperature);
-
-    if (historyCh1.length > historyLimit) {
-        historyCh1.shift();
-        historyCh2.shift();
+    if (historySv1.length > historyLimit) {
+        historySv1.shift();
+        historySv2.shift();
     }
 
     drawChart();
 
     setStatus(
-        `Đang đọc — ${new Date().toLocaleTimeString("vi-VN")}`,
+        `Đang đọc — ${
+            new Date().toLocaleTimeString(
+                "vi-VN"
+            )
+        }`,
         "online"
     );
 }
 
 
-async function pollingLoop() {
-    while (connected) {
-        const startedAt = Date.now();
-
-        try {
-            await readAllData();
-
-        } catch (error) {
-            addLog(`LỖI: ${error.message}`);
-            setStatus(error.message, "error");
-        }
-
-        const interval =
-            Number(
-                document.getElementById(
-                    "pollInterval"
-                ).value
-            );
-
-        const elapsed = Date.now() - startedAt;
-
-        await sleep(
-            Math.max(100, interval - elapsed)
-        );
-    }
-}
-
+/*
+ * =========================================================
+ * VẼ BIỂU ĐỒ SV1 VÀ SV2
+ * =========================================================
+ */
 
 function drawChart() {
     const canvas =
@@ -832,102 +1486,251 @@ function drawChart() {
     const width = canvas.width;
     const height = canvas.height;
 
-    context.clearRect(0, 0, width, height);
+    context.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
 
     context.fillStyle = "#0b1220";
-    context.fillRect(0, 0, width, height);
+
+    context.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
 
     const allValues = [
-        ...historyCh1,
-        ...historyCh2
-    ].filter(value => value !== null);
+        ...historySv1,
+        ...historySv2
+    ].filter(value =>
+        Number.isFinite(value)
+    );
 
     if (allValues.length < 2) {
         context.fillStyle = "#94a3b8";
         context.font = "18px Arial";
+
         context.fillText(
-            "Chưa có dữ liệu nhiệt độ hợp lệ",
+            "Chưa có dữ liệu SV",
             30,
             50
         );
+
         return;
     }
 
-    let minimum = Math.min(...allValues);
-    let maximum = Math.max(...allValues);
+    let minimum =
+        Math.min(...allValues);
+
+    let maximum =
+        Math.max(...allValues);
 
     if (maximum === minimum) {
         maximum += 1;
         minimum -= 1;
     }
 
-    const padding = 40;
+    /*
+     * Chừa một khoảng trên và dưới biểu đồ.
+     */
+    const margin =
+        Math.max(
+            1,
+            (maximum - minimum) * 0.15
+        );
 
-    function drawLine(values, color) {
+    maximum += margin;
+    minimum -= margin;
+
+    const paddingLeft = 65;
+    const paddingRight = 25;
+    const paddingTop = 45;
+    const paddingBottom = 40;
+
+    /*
+     * Đường lưới.
+     */
+    context.strokeStyle = "#334155";
+    context.lineWidth = 1;
+
+    for (let row = 0; row <= 5; row++) {
+        const y =
+            paddingTop +
+            row / 5 *
+            (
+                height -
+                paddingTop -
+                paddingBottom
+            );
+
+        context.beginPath();
+        context.moveTo(paddingLeft, y);
+        context.lineTo(
+            width - paddingRight,
+            y
+        );
+        context.stroke();
+
+        const labelValue =
+            maximum -
+            row / 5 *
+            (maximum - minimum);
+
+        context.fillStyle = "#94a3b8";
+        context.font = "13px Arial";
+
+        context.fillText(
+            `${labelValue.toFixed(1)}°C`,
+            7,
+            y + 4
+        );
+    }
+
+    function drawLine(
+        values,
+        color
+    ) {
         context.beginPath();
         context.strokeStyle = color;
         context.lineWidth = 3;
 
         let started = false;
 
-        values.forEach((value, index) => {
-            if (value === null) {
-                started = false;
-                return;
+        values.forEach(
+            (value, index) => {
+                if (!Number.isFinite(value)) {
+                    started = false;
+                    return;
+                }
+
+                const x =
+                    paddingLeft +
+                    index /
+                    Math.max(
+                        1,
+                        historyLimit - 1
+                    ) *
+                    (
+                        width -
+                        paddingLeft -
+                        paddingRight
+                    );
+
+                const y =
+                    height -
+                    paddingBottom -
+                    (
+                        value - minimum
+                    ) /
+                    (
+                        maximum - minimum
+                    ) *
+                    (
+                        height -
+                        paddingTop -
+                        paddingBottom
+                    );
+
+                if (!started) {
+                    context.moveTo(x, y);
+                    started = true;
+                } else {
+                    context.lineTo(x, y);
+                }
             }
-
-            const x =
-                padding +
-                index /
-                Math.max(1, historyLimit - 1) *
-                (width - padding * 2);
-
-            const y =
-                height - padding -
-                (value - minimum) /
-                (maximum - minimum) *
-                (height - padding * 2);
-
-            if (!started) {
-                context.moveTo(x, y);
-                started = true;
-            } else {
-                context.lineTo(x, y);
-            }
-        });
+        );
 
         context.stroke();
     }
 
-    drawLine(historyCh1, "#38bdf8");
-    drawLine(historyCh2, "#f59e0b");
+    /*
+     * SV CH1: xanh lá.
+     * SV CH2: cam.
+     */
+    drawLine(historySv1, "#22c55e");
+    drawLine(historySv2, "#f59e0b");
 
-    context.fillStyle = "#38bdf8";
-    context.font = "16px Arial";
-    context.fillText("CH1", 45, 25);
+    context.font = "bold 15px Arial";
 
-    context.fillStyle = "#f59e0b";
-    context.fillText("CH2", 105, 25);
-
-    context.fillStyle = "#94a3b8";
+    context.fillStyle = "#22c55e";
     context.fillText(
-        `${maximum.toFixed(1)} °C`,
-        5,
-        50
+        "SV CH1",
+        paddingLeft,
+        25
     );
 
+    context.fillStyle = "#f59e0b";
     context.fillText(
-        `${minimum.toFixed(1)} °C`,
-        5,
-        height - 15
+        "SV CH2",
+        paddingLeft + 90,
+        25
     );
 }
 
 
+/*
+ * =========================================================
+ * VÒNG LẶP ĐỌC THỜI GIAN THỰC
+ * =========================================================
+ */
+
+async function pollingLoop() {
+    while (connected) {
+        const startTime = Date.now();
+
+        /*
+         * Tạm dừng đọc realtime trong khi
+         * đang tải bảng thông số.
+         */
+        if (!loadingParameters) {
+            try {
+                await readRealtimeData();
+
+            } catch (error) {
+                addLog(
+                    `LỖI: ${error.message}`
+                );
+
+                setStatus(
+                    error.message,
+                    "error"
+                );
+            }
+        }
+
+        const interval =
+            Number(
+                document.getElementById(
+                    "pollInterval"
+                ).value
+            );
+
+        const elapsed =
+            Date.now() - startTime;
+
+        await sleep(
+            Math.max(
+                100,
+                interval - elapsed
+            )
+        );
+    }
+}
+
+
+/*
+ * =========================================================
+ * KẾT NỐI VÀ NGẮT KẾT NỐI
+ * =========================================================
+ */
+
 async function connectSerial() {
     if (!("serial" in navigator)) {
         throw new Error(
-            "Trình duyệt hoặc chính sách IT không cho phép Web Serial"
+            "Edge hoặc chính sách IT không cho phép Web Serial"
         );
     }
 
@@ -938,11 +1741,8 @@ async function connectSerial() {
             ).value
         );
 
-    /*
-     * Edge sẽ mở hộp thoại để người dùng
-     * chọn USB–RS485.
-     */
-    port = await navigator.serial.requestPort();
+    port =
+        await navigator.serial.requestPort();
 
     await port.open({
         baudRate: baudRate,
@@ -955,11 +1755,23 @@ async function connectSerial() {
 
     connected = true;
 
-    connectButton.textContent = "Ngắt kết nối";
-    connectButton.className = "disconnect";
+    connectButton.textContent =
+        "Ngắt kết nối";
 
-    setStatus("Đã kết nối", "online");
-    addLog(`Đã mở cổng với baud ${baudRate}`);
+    connectButton.className =
+        "disconnect";
+
+    readParametersButton.disabled =
+        false;
+
+    setStatus(
+        "Đã kết nối",
+        "online"
+    );
+
+    addLog(
+        `Đã mở USB–RS485 ở ${baudRate} baud`
+    );
 
     serialReadLoop();
     pollingLoop();
@@ -968,9 +1780,15 @@ async function connectSerial() {
 
 async function disconnectSerial() {
     connected = false;
+    loadingParameters = false;
+
+    readParametersButton.disabled =
+        true;
 
     if (pendingRequest) {
-        clearTimeout(pendingRequest.timer);
+        clearTimeout(
+            pendingRequest.timer
+        );
 
         pendingRequest.reject(
             new Error("Đã ngắt kết nối")
@@ -1006,9 +1824,15 @@ async function disconnectSerial() {
     connectButton.className = "";
 
     setStatus("Đã ngắt kết nối");
-    addLog("Đã đóng cổng serial");
+    addLog("Đã đóng cổng USB–RS485");
 }
 
+
+/*
+ * =========================================================
+ * SỰ KIỆN NÚT
+ * =========================================================
+ */
 
 connectButton.addEventListener(
     "click",
@@ -1023,8 +1847,14 @@ connectButton.addEventListener(
             }
 
         } catch (error) {
-            addLog(`LỖI KẾT NỐI: ${error.message}`);
-            setStatus(error.message, "error");
+            addLog(
+                `LỖI KẾT NỐI: ${error.message}`
+            );
+
+            setStatus(
+                error.message,
+                "error"
+            );
 
             connected = false;
             port = null;
@@ -1034,6 +1864,20 @@ connectButton.addEventListener(
         }
     }
 );
+
+
+readParametersButton.addEventListener(
+    "click",
+    readAllParameters
+);
+
+
+/*
+ * Khởi tạo bảng khi mở trang.
+ */
+createParameterTable();
+drawChart();
+
 </script>
 </body>
 </html>
